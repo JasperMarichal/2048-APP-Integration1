@@ -5,10 +5,10 @@ public class Game {
     private int turn;
     private Board board;
 
-    public Game(int currentScore, int turn, Board board) {
+    public Game(int currentScore, int turn, int boardSize) {
         this.currentScore = currentScore;
         this.turn = turn;
-        this.board = board;
+        this.board = new Board(boardSize);
     }
 
     public int getCurrentScore() {return currentScore;}

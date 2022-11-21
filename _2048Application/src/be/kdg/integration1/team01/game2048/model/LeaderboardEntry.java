@@ -1,14 +1,15 @@
 package be.kdg.integration1.team01.game2048.model;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 
 public class LeaderboardEntry {
     private int score;
     private String playerName;
     private LocalDateTime startDate;
-    private LocalDateTime duration;
+    private Duration duration;
 
-    public LeaderboardEntry(int score, String playerName, LocalDateTime startDate, LocalDateTime duration) {
+    public LeaderboardEntry(int score, String playerName, LocalDateTime startDate, Duration duration) {
         this.score = score;
         this.playerName = playerName;
         this.startDate = startDate;
@@ -27,7 +28,7 @@ public class LeaderboardEntry {
 
     public void setStartDate(LocalDateTime startDate) {this.startDate = startDate;}
 
-    public LocalDateTime getDuration() {return duration;}
+    public Duration getDuration() {return duration;}
 
-    public void setDuration(LocalDateTime duration) {this.duration = duration;}
+    public void setDuration(Duration duration) {this.duration = duration;}
 }
