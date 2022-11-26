@@ -28,7 +28,7 @@ public class _2048Application {
         players.add(new Player("me"));
         // select player or create new one
         int selectedPlayer = 0;
-        gameState = new Game(4, selectedPlayer);
+        gameState = new Game(4, players.get(selectedPlayer));
 
 
         try {

@@ -7,21 +7,21 @@ public class Game {
     private ArrayList<Turn> turns;
     private Board board;
 
-    private int currentPlayerId;
+    private Player currentPlayer;
 
-    public Game(int boardSize, int playerId) {
+    public Game(int boardSize, Player player) {
         this.currentScore = 0;
         this.turns = new ArrayList<Turn>();
         this.board = new Board(boardSize);
-        setCurrentPlayerId(playerId);
+        setCurrentPlayer(player);
     }
 
-    public int getCurrentPlayerId() {
-        return currentPlayerId;
+    public Player getCurrentPlayer() {
+        return currentPlayer;
     }
 
-    public void setCurrentPlayerId(int currentPlayerId) {
-        this.currentPlayerId = currentPlayerId;
+    public void setCurrentPlayer(Player currentPlayer) {
+        this.currentPlayer = currentPlayer;
     }
 
     public int getCurrentScore() {return currentScore;}
