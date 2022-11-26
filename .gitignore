@@ -10,4 +10,4 @@
 # Ignore unnecessary files
 **/.idea/uiDesigner.xml
 **/.idea/tasks.xml
-/MonopolyGame_4A/out/**/*.class
+/_2048Application/out/**/*.class
