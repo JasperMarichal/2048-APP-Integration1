@@ -15,4 +15,17 @@ public class Board {
     public void setSize(int size) {this.size = size;}
     public ArrayList<Block> getBlock() {return block;}
     public void setBlock(ArrayList<Block> block) {this.block = block;}
+
+    @Override
+    public String toString() {
+        return  ":-------------------------:\n" +
+                "|     |      |      |     |\n" +
+                ":-------------------------:\n" +
+                "|     |      |      |     |\n" +
+                ":-------------------------:\n" +
+                "|     |      | 2    |     |\n" +
+                ":-------------------------:\n" +
+                "| 2   |      |      |     |\n" +
+                ":-------------------------:\n";
+    }
 }
