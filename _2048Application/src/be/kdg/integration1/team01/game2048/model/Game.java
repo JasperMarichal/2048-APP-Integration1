@@ -9,13 +9,14 @@ public class Game {
     private int currentScore;
     private ArrayList<Turn> turns;
     private Board board;
-
     private Player currentPlayer;
+    private boolean running;
 
     public Game(int boardSize, Player player) {
         this.currentScore = 0;
         this.turns = new ArrayList<Turn>();
         this.board = new Board(boardSize);
+        this.running = false;
         setCurrentPlayer(player);
     }
 
@@ -41,6 +42,10 @@ public class Game {
     public Board getBoard() {return board;}
     public void setBoard(Board board) {this.board = board;}
 
+    public boolean isRunning() {
+        return running;
+    }
+
     public void makeMove(Direction slideDirection) {
         //TODO: update board, end turn etc.
     }
@@ -51,22 +56,13 @@ public class Game {
         String command;
 
         displayWireframe(Wireframe.GAMEBOARD, this); // Show initial board state
-        boolean running = true;
+
+        running = true;
         do {
             System.out.print("> ");
             command = keyboard.nextLine().toUpperCase();
+            processCommand(command);
 
-            switch (command) {
-                case "Q", "N" -> running = false;
-                case "L" -> displayWireframe(Wireframe.LEADERBOARD, this, true);
-                case "H" -> displayWireframe(Wireframe.COMMANDS, this, true);
-                case "R" -> displayWireframe(Wireframe.RULES, this, true);
-                case "0", "W", "UP" -> makeMove(Direction.UP);
-                case "1", "D", "RIGHT" -> makeMove(Direction.RIGHT);
-                case "2", "S", "DOWN" -> makeMove(Direction.DOWN);
-                case "3", "A", "LEFT" -> makeMove(Direction.LEFT);
-                default -> System.err.println("Invalid command, type 'H' to see the list of commands.");
-            }
             if (running) {
                 displayWireframe(Wireframe.GAMEBOARD, this);
             }
@@ -81,7 +77,7 @@ public class Game {
         }
 
         //Ask player if they want to play again unless they already entered the new game command
-        if(command.equals("N")) {
+        if(command.equalsIgnoreCase("N")) {
             return 1;
         }else {
             System.out.print("Do you want to play again? (y/N) ");
@@ -89,6 +85,21 @@ public class Game {
                 return 2;
             }
             return 0;
+        }
+    }
+
+    public void processCommand(String command) {
+        if (command == null || command.isEmpty()) return;
+        switch (command.toUpperCase()) {
+            case "Q", "N" -> running = false;
+            case "L" -> processCommand(displayWireframe(Wireframe.LEADERBOARD, this, true));
+            case "H" -> processCommand(displayWireframe(Wireframe.COMMANDS, this, true));
+            case "R" -> processCommand(displayWireframe(Wireframe.RULES, this, true));
+            case "0", "W", "UP" -> makeMove(Direction.UP);
+            case "1", "D", "RIGHT" -> makeMove(Direction.RIGHT);
+            case "2", "S", "DOWN" -> makeMove(Direction.DOWN);
+            case "3", "A", "LEFT" -> makeMove(Direction.LEFT);
+            default -> System.err.println("Invalid command, type 'H' to see the list of commands.");
         }
     }
 }
