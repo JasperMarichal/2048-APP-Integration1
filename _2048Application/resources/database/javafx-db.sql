@@ -17,11 +17,22 @@ create table INT_leaderboard (
 drop table int_leaderboard cascade;
 drop table int_players cascade;
 
-SELECT * from int_leaderboard
-group by player_name, score, start_date, duration
-order by player_name
-fetch next 5 rows only;
+-- select all players
+SELECT player_name FROM int_players;
+
+-- select top 5 leaderboard
+SELECT player_name, score, duration FROM int_leaderboard
+ORDER BY score DESC, duration, start_date DESC
+FETCH NEXT 5 ROWS ONLY;
+
+-- select top 5 attempts of a specific player
+SELECT player_name, score, duration FROM int_leaderboard
+WHERE player_name ILIKE 'aaa'
+ORDER BY score DESC, duration, start_date DESC
+FETCH NEXT 5 ROWS ONLY;
+
+-- insert test entries into leaderboard
 insert into int_players values('hello');
-INSERT INTO int_leaderboard values (4637 ,'hello' ,current_date , interval '11 minutes 2 seconds');
+INSERT INTO int_leaderboard values (4637 ,'hello' ,current_date , interval '342 seconds');
 insert into int_players values('aaa');
-INSERT INTO int_leaderboard values (5474 ,'aaa' ,current_date , interval '30 minutes 2 seconds');
+INSERT INTO int_leaderboard values (5474 ,'aaa' ,current_date , interval '213 seconds');

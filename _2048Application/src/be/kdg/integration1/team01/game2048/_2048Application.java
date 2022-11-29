@@ -1,41 +1,62 @@
 package be.kdg.integration1.team01.game2048;
 
+import be.kdg.integration1.team01.game2048.manager.PlayerManager;
+import be.kdg.integration1.team01.game2048.manager.WireframesManager;
 import be.kdg.integration1.team01.game2048.model.*;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class _2048Application {
 
-    private static ArrayList<LeaderboardEntry> leaderboard;
-    private static ArrayList<Player> players;
-    private static Game gameState;
+    public static ArrayList<LeaderboardEntry> leaderboard;
+    public static ArrayList<Player> players;
+    public static Scanner keyboard;
     public static void main(String[] args) {
-        Scanner keyboard = new Scanner(System.in);
+        keyboard = new Scanner(System.in);
 
         Connection databaseConnection = initializeDatabase();
         if(databaseConnection == null) {
             return;
         }
 
-        leaderboard = new ArrayList<>();
-        players = new ArrayList<>();
-        //load players
-        players.add(new Player("me"));
-        // select player or create new one
-        int selectedPlayer = 0;
-        gameState = new Game(4, players.get(selectedPlayer));
+        players = PlayerManager.updatePlayersList(databaseConnection);
 
+        WireframesManager.displayWireframe(Wireframe.WELCOME, null);
+        keyboard.nextLine(); //Press enter to begin
+
+        Player player = null;
+        int endMode = 1; //0 = quit, 1 = ask for player name again, 2 = same player, start new game
+        do {
+            if(endMode == 1) {
+                player = PlayerManager.selectPlayerOrCreateNew(databaseConnection);
+            }
+
+            //GameSession object
+            Game gameState = new Game(4, player);
+
+            //Start the new game
+            endMode = gameState.play();
+        }while (endMode != 0);
 
         try {
             databaseConnection.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public static Player findPlayerByName(String playerName) {
+        // Find player with given name if it already exists otherwise return null
+        Player player = null;
+        for (Player p : players) {
+            if (p.getName().equals(playerName)) {
+                player = p;
+                break;
+            }
+        }
+        return player;
     }
 
     public static Connection initializeDatabase() {
