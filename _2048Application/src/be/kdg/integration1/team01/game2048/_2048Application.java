@@ -22,6 +22,7 @@ public class _2048Application {
         }
 
         players = PlayerManager.updatePlayersList(databaseConnection);
+        leaderboard = new ArrayList<>();
 
         WireframesManager.displayWireframe(Wireframe.WELCOME, null);
         keyboard.nextLine(); //Press enter to begin
@@ -37,7 +38,8 @@ public class _2048Application {
             Game gameState = new Game(4, player);
 
             //Start the new game
-            endMode = gameState.play();
+            endMode = gameState.play(databaseConnection);
+            System.out.println("\n\n\n");
         }while (endMode != 0);
 
         try {
@@ -45,18 +47,6 @@ public class _2048Application {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-
-    public static Player findPlayerByName(String playerName) {
-        // Find player with given name if it already exists otherwise return null
-        Player player = null;
-        for (Player p : players) {
-            if (p.getName().equals(playerName)) {
-                player = p;
-                break;
-            }
-        }
-        return player;
     }
 
     public static Connection initializeDatabase() {
@@ -84,6 +74,22 @@ public class _2048Application {
                 "    ,duration interval constraint nn_duration not null\n" +
                 ");"
             );
+            // TEST LEADERBOARD VALUES
+            prepareDB.executeUpdate("DELETE FROM INT_leaderboard WHERE player_name IN ('hello', 'aaa', 'DemO');");
+            prepareDB.executeUpdate("insert into int_players values('hello') on conflict do nothing;");
+            prepareDB.executeUpdate("INSERT INTO int_leaderboard values (4637 ,'hello' ,current_date , interval '342 seconds') on conflict do nothing;");
+            prepareDB.executeUpdate("INSERT INTO int_leaderboard values (6443 ,'hello' ,current_date , interval '634 seconds') on conflict do nothing;");
+            prepareDB.executeUpdate("INSERT INTO int_leaderboard values (124 ,'hello' ,current_date , interval '53 seconds') on conflict do nothing;");
+            prepareDB.executeUpdate("INSERT INTO int_leaderboard values (2341 ,'hello' ,current_date , interval '123 seconds') on conflict do nothing;");
+            prepareDB.executeUpdate("INSERT INTO int_leaderboard values (1231 ,'hello' ,current_date , interval '32 seconds') on conflict do nothing;");
+            prepareDB.executeUpdate("INSERT INTO int_leaderboard values (234 ,'hello' ,current_date , interval '64 seconds') on conflict do nothing;");
+            prepareDB.executeUpdate("insert into int_players values('aaa') on conflict do nothing;");
+            prepareDB.executeUpdate("INSERT INTO int_leaderboard values (5474 ,'aaa' ,current_date , interval '213 seconds') on conflict do nothing;");
+            prepareDB.executeUpdate("INSERT INTO int_leaderboard values (5474 ,'aaa' ,current_date , interval '123 seconds') on conflict do nothing;");
+            prepareDB.executeUpdate("INSERT INTO int_leaderboard values (5634 ,'aaa' ,current_date , interval '213 seconds') on conflict do nothing;");
+            prepareDB.executeUpdate("insert into int_players values('DemO') on conflict do nothing;");
+            prepareDB.executeUpdate("INSERT INTO int_leaderboard values (2345 ,'DemO' ,current_date , interval '65 seconds') on conflict do nothing;");
+            prepareDB.executeUpdate("INSERT INTO int_leaderboard values (2345 ,'DemO' ,current_date - interval '2 days', interval '65 seconds') on conflict do nothing;");
             // return active database connection for the program to use
             System.out.println("INFO: Successfully connected to database!");
             return connection;

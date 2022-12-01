@@ -1,9 +1,13 @@
 package be.kdg.integration1.team01.game2048.manager;
 
+import be.kdg.integration1.team01.game2048._2048Application;
+import be.kdg.integration1.team01.game2048.model.LeaderboardEntry;
 import be.kdg.integration1.team01.game2048.model.Wireframe;
 import be.kdg.integration1.team01.game2048.model.Game;
 
 import java.util.Scanner;
+
+import static be.kdg.integration1.team01.game2048._2048Application.leaderboard;
 
 public class WireframesManager {
 
@@ -55,7 +59,7 @@ public class WireframesManager {
                         " \\____/\\___/|_| |_| |_|_| |_| |_|\\__,_|_| |_|\\__,_|___/\n" +
                         "Here are the commands you can use:\n" +
                         "Q - to quit the game \n" +
-                        "L - to open a leaderboard page  \n" +
+                        "L - to open a leaderboard page (Usage: L [A][F <player_name>] )\n" +
                         "H - to open a commands page \n" +
                         "R - to open a Rules page \n" +
                         "N - to start a new game\n" +
@@ -65,18 +69,22 @@ public class WireframesManager {
                         "3 - to move the tiles left\n";
             }
             case LEADERBOARD -> {
+                StringBuilder formattedEntries = new StringBuilder();
+                int i = 0;
+                for(LeaderboardEntry entry : leaderboard) {
+                    formattedEntries.append(" %20s  %,16d  %8d  %10s\n".formatted(entry.getPlayerName(), entry.getScore(), entry.getDuration().getSeconds(), entry.getStartDate().toLocalDate()));
+                    i++;
+                }
+                for (int j = i; j < 5; j++) {
+                    formattedEntries.append(" %20s  %16s  %8s  %10s\n".formatted("-", "-", "-", "-"));
+                }
                 yield   " _                    _           _                         _ \n" +
                         "| |                  | |         | |                       | |\n" +
                         "| |     ___  __ _  __| | ___ _ __| |__   ___   __ _ _ __ __| |\n" +
                         "| |    / _ \\/ _` |/ _` |/ _ \\ '__| '_ \\ / _ \\ / _` | '__/ _` |\n" +
                         "| |___|  __/ (_| | (_| |  __/ |  | |_) | (_) | (_| | | | (_| |\n" +
                         "\\_____/\\___|\\__,_|\\__,_|\\___|_|  |_.__/ \\___/ \\__,_|_|  \\__,_|\n" +
-                        "Name:                   Score:            Time:\n" +
-                        " %22s  %,16d  %8d sec\n".formatted("PlayerWhoTotallyExists", 3932156, 127800) +
-                        " %22s  %,16d  %8d sec\n".formatted("ProGamer66", 2048, 1938) +
-                        " %22s  %,16d  %8d sec\n".formatted("ProAtBeingBad", 4, 1) +
-                        " %22s  %16s  %8s\n".formatted("-", "-", "-") +
-                        " %22s  %16s  %8s\n".formatted("-", "-", "-");
+                        "Name:                 Score:            Time(s):  Date: \n" + formattedEntries;
             }
             case GAMEBOARD -> {
                 if (activeSession == null) {

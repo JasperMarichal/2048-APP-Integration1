@@ -21,18 +21,20 @@ drop table int_players cascade;
 SELECT player_name FROM int_players;
 
 -- select top 5 leaderboard
-SELECT player_name, score, duration FROM int_leaderboard
+SELECT score, player_name, start_date, duration FROM int_leaderboard
 ORDER BY score DESC, duration, start_date DESC
 FETCH NEXT 5 ROWS ONLY;
 
 -- select top 5 attempts of a specific player
-SELECT player_name, score, duration FROM int_leaderboard
+SELECT score, player_name, start_date, duration FROM int_leaderboard
 WHERE player_name ILIKE 'aaa'
 ORDER BY score DESC, duration, start_date DESC
 FETCH NEXT 5 ROWS ONLY;
 
 -- insert test entries into leaderboard
-insert into int_players values('hello');
-INSERT INTO int_leaderboard values (4637 ,'hello' ,current_date , interval '342 seconds');
-insert into int_players values('aaa');
-INSERT INTO int_leaderboard values (5474 ,'aaa' ,current_date , interval '213 seconds');
+insert into int_players values('hello') on conflict do nothing;
+INSERT INTO int_leaderboard values (4637 ,'hello' ,current_date , interval '342 seconds') on conflict do nothing;
+insert into int_players values('aaa') on conflict do nothing;
+INSERT INTO int_leaderboard values (5474 ,'aaa' ,current_date , interval '213 seconds') on conflict do nothing;
+-- remove test scoreboard entries from test players
+DELETE FROM INT_leaderboard WHERE player_name IN ('hello', 'aaa', 'DemO');

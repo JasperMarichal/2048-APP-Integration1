@@ -1,7 +1,12 @@
 package be.kdg.integration1.team01.game2048.model;
 
+import be.kdg.integration1.team01.game2048.manager.LeaderboardManager;
+
 import static be.kdg.integration1.team01.game2048.manager.WireframesManager.displayWireframe;
 
+import java.sql.Connection;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -50,8 +55,9 @@ public class Game {
         //TODO: update board, end turn etc.
     }
 
-    public int play() {
+    public int play(Connection connection) {
         Scanner keyboard = new Scanner(System.in);
+        LocalDateTime start_datetime = LocalDateTime.now();
 
         String command;
 
@@ -61,25 +67,31 @@ public class Game {
         do {
             System.out.print("> ");
             command = keyboard.nextLine().toUpperCase();
-            processCommand(command);
+            processCommand(command, connection);
 
             if (running) {
                 displayWireframe(Wireframe.GAMEBOARD, this);
             }
         }while (running);
-        // Print game results
-        System.out.printf("Thanks for playing, %s!\nEnd score: %d\nTime: %d seconds\n", getCurrentPlayer().getName(), getCurrentScore(), 200);
+        // End game results
+        Duration totalGameDuration = Duration.between(start_datetime, LocalDateTime.now());
+        LeaderboardEntry finalResult = new LeaderboardEntry(getCurrentScore(), getCurrentPlayer().getName(), start_datetime, totalGameDuration);
 
-        //TODO: calculate time, save score when leaderboard is implemented
+        System.out.printf("Thanks for playing, %s!\nEnd score: %d\nTime: %d seconds\n", finalResult.getPlayerName(), finalResult.getScore(), finalResult.getDuration().getSeconds());
+
         System.out.print("Do you wish to save this score? (y/N) ");
         if(keyboard.nextLine().equalsIgnoreCase("Y")) {
             //TODO: save score
+            if(LeaderboardManager.saveAttempt(connection, finalResult)) {
+                System.out.println("Score saved!");
+            }
         }
 
         //Ask player if they want to play again unless they already entered the new game command
         if(command.equalsIgnoreCase("N")) {
             return 1;
         }else {
+            System.out.println(command);
             System.out.print("Do you want to play again? (y/N) ");
             if(keyboard.nextLine().equalsIgnoreCase("Y")) {
                 return 2;
@@ -88,13 +100,33 @@ public class Game {
         }
     }
 
-    public void processCommand(String command) {
+    public void processCommand(String command, Connection connection) {
         if (command == null || command.isEmpty()) return;
-        switch (command.toUpperCase()) {
+        String[] args = command.toUpperCase().split(" ");
+        if(args.length < 1) return;
+        command = args[0];
+        switch (command) {
             case "Q", "N" -> running = false;
-            case "L" -> processCommand(displayWireframe(Wireframe.LEADERBOARD, this, true));
-            case "H" -> processCommand(displayWireframe(Wireframe.COMMANDS, this, true));
-            case "R" -> processCommand(displayWireframe(Wireframe.RULES, this, true));
+            case "L" -> {
+                boolean fetchAll = false;
+                boolean fetchComplete = false;
+                if(args.length >= 2) {
+                    fetchAll = args[1].contains("A");
+                    if(args[1].contains("F")) {
+                        if(args.length >= 3) {
+                            LeaderboardManager.fetchTopAttemptsOfPlayer(connection, args[2], fetchAll);
+                            fetchComplete = true;
+                        }else {
+                            System.err.println("Missing argument PlayerName. Usage: L F <player_name>");
+                            return;
+                        }
+                    }
+                }
+                if(!fetchComplete) LeaderboardManager.fetchTopScores(connection, fetchAll);
+                processCommand(displayWireframe(Wireframe.LEADERBOARD, this, true), connection);
+            }
+            case "H" -> processCommand(displayWireframe(Wireframe.COMMANDS, this, true), connection);
+            case "R" -> processCommand(displayWireframe(Wireframe.RULES, this, true), connection);
             case "0", "W", "UP" -> makeMove(Direction.UP);
             case "1", "D", "RIGHT" -> makeMove(Direction.RIGHT);
             case "2", "S", "DOWN" -> makeMove(Direction.DOWN);
