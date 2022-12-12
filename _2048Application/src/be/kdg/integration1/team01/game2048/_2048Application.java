@@ -62,18 +62,50 @@ public class _2048Application {
             Statement prepareDB = connection.createStatement();
             // table: INT_players
             prepareDB.executeUpdate(
-                "create table if not exists INT_players(" +
-                "    player_name varchar(20) constraint pk_players PRIMARY KEY" +
-                ");"
+                    """
+                            CREATE TABLE IF NOT EXISTS INT_players(
+                                player_name varchar(20) constraint pk_players PRIMARY KEY
+                            );"""
             );
             // table: INT_leaderboard
             prepareDB.executeUpdate(
-                "create table if not exists INT_leaderboard (" +
-                "    score numeric\n" +
-                "    ,player_name varchar(20) constraint fk_player_name references INT_players(player_name)" +
-                "    ,start_date date constraint nn_start_date not null\n" +
-                "    ,duration interval constraint nn_duration not null\n" +
-                ");"
+                    """
+                            CREATE TABLE IF NOT EXISTS INT_leaderboard (
+                                score numeric
+                                ,player_name varchar(20) constraint fk_player_name references INT_players(player_name)
+                                ,start_date date constraint nn_start_date not null
+                                ,duration interval constraint nn_duration not null
+                            );"""
+            );
+            // table: INT_blocks
+            prepareDB.executeUpdate(
+                    """
+                            CREATE TABLE IF NOT EXISTS INT_blocks(
+                                block_id numeric constraint pk_blocks primary key
+                                ,block_value numeric not null
+                                ,block_x numeric(1) constraint nn_block_x not null
+                                ,block_y numeric(1) constraint nn_block_y not null
+                            );"""
+            );
+            // table: INT_board
+            prepareDB.executeUpdate(
+                    """
+                            CREATE TABLE IF NOT EXISTS INT_board(
+                                board_id numeric constraint pk_boards primary key
+                                ,board_size numeric
+                                ,block_id numeric constraint fk_block_id references INT_blocks(block_id)
+                            );"""
+            );
+            // table: INT_games
+            prepareDB.executeUpdate(
+                    """
+                            CREATE TABLE IF NOT EXISTS INT_games(
+                                game_id numeric constraint pk_games primary key
+                                ,player_name varchar(20) constraint fk_player_name references INT_players(player_name)
+                                ,current_score numeric
+                                ,current_turn numeric
+                                ,board_id numeric constraint fk_board_id references INT_board(board_id)
+                            );"""
             );
             // TEST LEADERBOARD VALUES
             prepareDB.executeUpdate("DELETE FROM INT_leaderboard WHERE player_name IN ('hello', 'aaa', 'DemO');");
