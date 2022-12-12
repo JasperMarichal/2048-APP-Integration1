@@ -53,9 +53,10 @@ public class _2048Application {
         try {
             System.out.println("INFO: Connecting to database...");
             Connection connection = DriverManager.getConnection(
-                    "jdbc:postgresql://localhost:5432/ascii01"
-                    ,"postgres"
-                    ,"Student_1234");
+                "jdbc:postgresql://localhost:5432/ascii01"
+                ,"postgres"
+                ,"Student_1234"
+            );
 
             // Create tables if they are missing:
             Statement prepareDB = connection.createStatement();

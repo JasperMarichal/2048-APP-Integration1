@@ -50,9 +50,45 @@ public class Game {
     public boolean isRunning() {
         return running;
     }
-
     public void makeMove(Direction slideDirection) {
-        //TODO: update board, end turn etc.
+        //generalize board into a 2D array
+        Block[][] blocksArray = board.getGeneralArray(slideDirection);
+        //simulate sliding
+        slideBoard(blocksArray);
+        //update board
+        board.updateFromGeneralArray(blocksArray, slideDirection);
+        //TODO: end turn etc.
+        turns.add(new Turn(slideDirection));
+        board.addBlocksRandomly(2,1);
+    }
+
+    private void slideBoard(Block[][] blocksArray) {
+        for (int col = 0; col < board.getSize(); col++) {
+            boolean[] alreadyCombined = new boolean[board.getSize()];
+            for (int row = 1; row < board.getSize(); row++) {
+                if(blocksArray[col][row] == null) continue; //skips to next cell if this cell is empty
+                int newPos = row;
+                // move "down" until we hit another block or the wall
+                while (newPos > 0 && blocksArray[col][newPos-1] == null) {
+                    newPos--;
+                }
+                //Actually move the block to the new position (copy to newPos remove from old)
+                if(newPos != row) {
+                    blocksArray[col][newPos] = blocksArray[col][row];
+                    blocksArray[col][row] = null;
+                }
+                // If there is no block underneath we can skip to the next cell
+                if(newPos == 0) continue;
+                //Check if we can combine the current block with the one underneath
+                // (numbers must match, and it cannot be an already combined block)
+                if(blocksArray[col][newPos-1].getNumber() == blocksArray[col][newPos].getNumber() && !alreadyCombined[newPos-1]) {
+                    //Combine the current block with the one under it
+                    blocksArray[col][newPos-1].setNumber(blocksArray[col][newPos-1].getNumber() + blocksArray[col][newPos].getNumber());
+                    alreadyCombined[newPos-1] = true;
+                    blocksArray[col][newPos] = null;
+                }
+            }
+        }
     }
 
     public int play(Connection connection) {
@@ -61,6 +97,7 @@ public class Game {
 
         String command;
 
+        board.addBlocksRandomly(2,2); // adds two 2's to begin with
         displayWireframe(Wireframe.GAMEBOARD, this); // Show initial board state
 
         running = true;

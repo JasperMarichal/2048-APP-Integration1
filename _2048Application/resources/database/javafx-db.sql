@@ -5,7 +5,6 @@ CREATE DATABASE ascii01;
 create table INT_players(
     player_name varchar(20) constraint pk_players PRIMARY KEY
 );
-
 create table INT_leaderboard (
     score numeric
     ,player_name varchar(20) constraint fk_player_name references INT_players(player_name)
@@ -32,9 +31,10 @@ ORDER BY score DESC, duration, start_date DESC
 FETCH NEXT 5 ROWS ONLY;
 
 -- insert test entries into leaderboard
-insert into int_players values('hello') on conflict do nothing;
-INSERT INTO int_leaderboard values (4637 ,'hello' ,current_date , interval '342 seconds') on conflict do nothing;
-insert into int_players values('aaa') on conflict do nothing;
-INSERT INTO int_leaderboard values (5474 ,'aaa' ,current_date , interval '213 seconds') on conflict do nothing;
+-- insert into int_players values('hello') on conflict do nothing;
+-- INSERT INTO int_leaderboard values (4637 ,'hello' ,current_date , interval '342 seconds') on conflict do nothing;
+-- insert into int_players values('aaa') on conflict do nothing;
+-- INSERT INTO int_leaderboard values (5474 ,'aaa' ,current_date , interval '213 seconds') on conflict do nothing;
+
 -- remove test scoreboard entries from test players
-DELETE FROM INT_leaderboard WHERE player_name IN ('hello', 'aaa', 'DemO');
+-- DELETE FROM INT_leaderboard WHERE player_name IN ('hello', 'aaa', 'DemO');
