@@ -77,6 +77,14 @@ public class _2048Application {
                                 ,duration interval constraint nn_duration not null
                             );"""
             );
+            // table: INT_board
+            prepareDB.executeUpdate(
+                    """
+                            CREATE TABLE IF NOT EXISTS INT_board(
+                                board_id numeric constraint pk_boards primary key
+                                ,board_size numeric
+                            );"""
+            );
             // table: INT_blocks
             prepareDB.executeUpdate(
                     """
@@ -86,14 +94,6 @@ public class _2048Application {
                                 ,block_x numeric(1) constraint nn_block_x not null
                                 ,block_y numeric(1) constraint nn_block_y not null
                                 ,board_id numeric constraint fk_board_id references INT_board(board_id)
-                            );"""
-            );
-            // table: INT_board
-            prepareDB.executeUpdate(
-                    """
-                            CREATE TABLE IF NOT EXISTS INT_board(
-                                board_id numeric constraint pk_boards primary key
-                                ,board_size numeric
                             );"""
             );
             // table: INT_games
