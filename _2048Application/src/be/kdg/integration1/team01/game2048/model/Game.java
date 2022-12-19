@@ -1,6 +1,7 @@
 package be.kdg.integration1.team01.game2048.model;
 
 import be.kdg.integration1.team01.game2048.manager.LeaderboardManager;
+import be.kdg.integration1.team01.game2048.manager.SaveManager;
 
 import static be.kdg.integration1.team01.game2048.manager.WireframesManager.displayWireframe;
 

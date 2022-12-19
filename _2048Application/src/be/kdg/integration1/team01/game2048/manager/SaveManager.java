@@ -8,7 +8,8 @@ public class SaveManager {
     public static long saveBoard(Connection connection, Board board) {
         try {
             PreparedStatement insertAttempt = connection.prepareStatement(
-                    "INSERT INTO int_board VALUES (?)"
+                    "INSERT INTO int_board (board_size) VALUES (?)"
+                    , PreparedStatement.RETURN_GENERATED_KEYS
             );
             insertAttempt.setInt(1, board.getSize());
             insertAttempt.executeUpdate();
@@ -39,9 +40,9 @@ public class SaveManager {
                 throw new SQLException("Save game: Failed to save board to database");
             }
             PreparedStatement insertAttempt = connection.prepareStatement(
-                    "INSERT INTO int_games VALUES (?, ?, ?, ?)"
+                    "INSERT INTO int_games (player_name, current_score, current_turn, board_id) VALUES (?, ?, ?, ?)"
             );
-            insertAttempt.setString(1, String.valueOf(game.getCurrentPlayer()));
+            insertAttempt.setString(1, game.getCurrentPlayer().getName());
             insertAttempt.setInt(2, game.getCurrentScore());
             insertAttempt.setInt(3, game.getTurns().size());
             insertAttempt.setLong(4, board_id);
@@ -57,7 +58,7 @@ public class SaveManager {
         try {
 
             PreparedStatement insertAttempt = connection.prepareStatement(
-                    "INSERT INTO int_games VALUES (?, ?, ?, ?)"
+                    "INSERT INTO int_blocks (block_value, block_x, block_y, board_id) VALUES (?, ?, ?, ?)"
             );
             insertAttempt.setInt(1, block.getValue());
             insertAttempt.setInt(2, block.getPositionX());

@@ -81,31 +81,31 @@ public class _2048Application {
             prepareDB.executeUpdate(
                     """
                             CREATE TABLE IF NOT EXISTS INT_board(
-                                board_id numeric constraint pk_boards primary key
-                                ,board_size numeric
-                            );"""
+                                  board_id bigserial constraint pk_board_id primary key
+                                  ,board_size numeric
+                              );"""
             );
             // table: INT_blocks
             prepareDB.executeUpdate(
                     """
                             CREATE TABLE IF NOT EXISTS INT_blocks(
-                                block_id numeric constraint pk_blocks primary key
-                                ,block_value numeric not null
-                                ,block_x numeric(1) constraint nn_block_x not null
-                                ,block_y numeric(1) constraint nn_block_y not null
-                                ,board_id numeric constraint fk_board_id references INT_board(board_id)
-                            );"""
+                                  block_id bigserial constraint pk_block_id primary key
+                                  ,block_value numeric not null
+                                  ,block_x numeric(1) constraint nn_block_x not null
+                                  ,block_y numeric(1) constraint nn_block_y not null
+                                  ,board_id bigserial constraint fk_board_id references INT_board(board_id)
+                              );"""
             );
             // table: INT_games
             prepareDB.executeUpdate(
                     """
                             CREATE TABLE IF NOT EXISTS INT_games(
-                                game_id numeric constraint pk_games primary key
-                                ,player_name varchar(20) constraint fk_player_name references INT_players(player_name)
-                                ,current_score numeric
-                                ,current_turn numeric
-                                ,board_id numeric constraint fk_board_id references INT_board(board_id)
-                            );"""
+                                 game_id bigserial constraint pk_game_id primary key
+                                 ,player_name varchar(20) constraint fk_player_name references INT_players(player_name)
+                                 ,current_score numeric
+                                 ,current_turn numeric
+                                 ,board_id bigserial constraint fk_board_id references INT_board(board_id)
+                             );"""
             );
             // TEST LEADERBOARD VALUES
             prepareDB.executeUpdate("DELETE FROM INT_leaderboard WHERE player_name IN ('hello', 'aaa', 'DemO');");
