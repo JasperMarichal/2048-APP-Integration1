@@ -96,18 +96,23 @@ public class Game {
         Scanner keyboard = new Scanner(System.in);
         LocalDateTime start_datetime = LocalDateTime.now();
 
-        String command;
+        String command = "";
 
         board.addBlocksRandomly(2,2); // adds two 2's to begin with
         displayWireframe(Wireframe.GAMEBOARD, this); // Show initial board state
 
         running = true;
         do {
-            System.out.print("> ");
-            command = keyboard.nextLine().toUpperCase();
-            processCommand(command, connection);
+            // Ask for new command if there is no command entered
+            if(command == null || command.isEmpty()) {
+                System.out.print("> ");
+                command = keyboard.nextLine().toUpperCase();
+            }
+            // The process command can return the next command in some cases
+            String nextCommand = processCommand(command, connection);
 
             if (running) {
+                command = nextCommand;
                 displayWireframe(Wireframe.GAMEBOARD, this);
             }
         }while (running);
@@ -129,7 +134,6 @@ public class Game {
         if(command.equalsIgnoreCase("N")) {
             return 1;
         }else {
-            System.out.println(command);
             System.out.print("Do you want to play again? (y/N) ");
             if(keyboard.nextLine().equalsIgnoreCase("Y")) {
                 return 2;
@@ -138,11 +142,12 @@ public class Game {
         }
     }
 
-    public void processCommand(String command, Connection connection) {
-        if (command == null || command.isEmpty()) return;
+    public String processCommand(String command, Connection connection) {
+        if (command == null || command.isEmpty()) return "";
         String[] args = command.toUpperCase().split(" ");
-        if(args.length < 1) return;
+        if(args.length < 1) return "";
         command = args[0];
+        boolean waitToContinue = false;
         switch (command) {
             case "Q", "N" -> running = false;
             case "L" -> {
@@ -156,20 +161,33 @@ public class Game {
                             fetchComplete = true;
                         }else {
                             System.err.println("Missing argument PlayerName. Usage: L F <player_name>");
-                            return;
+                            return null;
                         }
                     }
                 }
                 if(!fetchComplete) LeaderboardManager.fetchTopScores(connection, fetchAll);
-                processCommand(displayWireframe(Wireframe.LEADERBOARD, this, true), connection);
+                displayWireframe(Wireframe.LEADERBOARD, this);
+                waitToContinue = true;
             }
-            case "H" -> processCommand(displayWireframe(Wireframe.COMMANDS, this, true), connection);
-            case "R" -> processCommand(displayWireframe(Wireframe.RULES, this, true), connection);
+            case "H" -> {
+                displayWireframe(Wireframe.COMMANDS, this);
+                waitToContinue = true;
+            }
+            case "R" -> {
+                displayWireframe(Wireframe.RULES, this);
+                waitToContinue = true;
+            }
             case "0", "W", "UP" -> makeMove(Direction.UP);
             case "1", "D", "RIGHT" -> makeMove(Direction.RIGHT);
             case "2", "S", "DOWN" -> makeMove(Direction.DOWN);
             case "3", "A", "LEFT" -> makeMove(Direction.LEFT);
             default -> System.err.println("Invalid command, type 'H' to see the list of commands.");
         }
+        if(waitToContinue) {
+            Scanner keyboard = new Scanner(System.in);
+            System.out.print("<Press Enter to continue>");
+            return keyboard.nextLine();
+        }
+        return "";
     }
 }

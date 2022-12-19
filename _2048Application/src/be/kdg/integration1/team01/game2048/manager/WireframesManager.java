@@ -12,9 +12,6 @@ import static be.kdg.integration1.team01.game2048._2048Application.leaderboard;
 public class WireframesManager {
 
     public static void displayWireframe(Wireframe wf, Game activeSession) {
-        displayWireframe(wf, activeSession, false);
-    }
-    public static String displayWireframe(Wireframe wf, Game activeSession, boolean waitToContinue) {
         String wireframe = switch (wf) {
             case WELCOME -> {
                 yield   " _ _ _  ___  _    ___  ___  __ __  ___   ___  ___   ___  ___   __   ___ \n" +
@@ -98,11 +95,5 @@ public class WireframesManager {
             }
         };
         System.out.println(wireframe);
-        if(waitToContinue) {
-            Scanner keyboard = new Scanner(System.in);
-            System.out.print("<Press Enter to continue>");
-            return keyboard.nextLine();
-        }
-        return null;
     }
 }
