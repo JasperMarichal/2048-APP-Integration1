@@ -1,8 +1,12 @@
 package be.kdg.integration1.team01.game2048.manager;
 
 import be.kdg.integration1.team01.game2048.model.*;
+import org.postgresql.util.PGInterval;
 
 import java.sql.*;
+import java.util.ArrayList;
+
+import static be.kdg.integration1.team01.game2048._2048Application.leaderboard;
 
 public class SaveManager {
     public static long saveBoard(Connection connection, Board board) {
@@ -71,5 +75,88 @@ public class SaveManager {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public static Game loadGame(Connection connection, long gameId) {
+        try {
+
+            PreparedStatement getGame = connection.prepareStatement(
+                    """ 
+                            SELECT current_score
+                            , current_turn
+                            ,board_id
+                            ,player_name 
+                            FROM int_games WHERE game_id = ?;
+                        """
+            );
+            getGame.setLong(1, gameId);
+            ResultSet gameEntry = getGame.executeQuery();
+
+            if (gameEntry.next()) {
+                return new Game(gameEntry.getInt(1)
+                        , new ArrayList<>()
+                        , loadBoard(connection, gameEntry.getLong(3))
+                        , PlayerManager.findPlayerByName(gameEntry.getString(4))
+                        , true);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Load Game: Loading of the game failed");
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Board loadBoard(Connection connection, long boardId){
+        try{
+            PreparedStatement getBoard = connection.prepareStatement(
+                    """ 
+                            SELECT
+                            board_id
+                            ,board_size
+                            FROM int_board
+                            WHERE board_id = ?;
+                        """
+            );
+            getBoard.setLong(1, boardId);
+            ResultSet boardEntry = getBoard.executeQuery();
+
+            if (boardEntry.next()) {
+                return new Board(boardEntry.getInt(1));
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Load board: Loading of the board failed");
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Block loadBlock(Connection connection, long boardId){
+        try {
+            PreparedStatement getBlock = connection.prepareStatement(
+                    """
+                        SELECT 
+                        block_value
+                        ,block_x
+                        ,block_y
+                        FROM int_blocks
+                        WHERE board_id = ?;
+                        """
+            );
+            getBlock.setLong(1, boardId);
+            ResultSet blockEntry = getBlock.executeQuery();
+
+            while(blockEntry.next()) {
+                return new Block(blockEntry.getInt(2)
+                ,blockEntry.getInt(3)
+                ,blockEntry.getInt(4));
+            }
+
+        }catch (SQLException e) {
+            System.err.println("Load Block; Loading of the block failed");
+            e.printStackTrace();
+        }
+        return null;
     }
 }

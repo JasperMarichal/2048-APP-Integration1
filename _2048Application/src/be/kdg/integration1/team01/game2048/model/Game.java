@@ -26,6 +26,14 @@ public class Game {
         setCurrentPlayer(player);
     }
 
+    public Game(int currentScore, ArrayList<Turn> turns, Board board, Player currentPlayer, boolean running) {
+        this.currentScore = currentScore;
+        this.turns = turns;
+        this.board = board;
+        this.currentPlayer = currentPlayer;
+        this.running = running;
+    }
+
     public Player getCurrentPlayer() {
         return currentPlayer;
     }
