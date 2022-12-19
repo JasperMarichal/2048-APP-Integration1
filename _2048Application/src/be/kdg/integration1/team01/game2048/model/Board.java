@@ -144,7 +144,7 @@ public class Board {
                 if(blocksArray[x][y] == null) {
                     brd.append("|%5s".formatted(" "));
                 }else {
-                    brd.append("|%5d".formatted(blocksArray[x][y].getNumber()));
+                    brd.append("|%5d".formatted(blocksArray[x][y].getValue()));
                 }
             }
             brd.append("|\n");

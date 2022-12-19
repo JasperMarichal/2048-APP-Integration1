@@ -85,6 +85,7 @@ public class _2048Application {
                                 ,block_value numeric not null
                                 ,block_x numeric(1) constraint nn_block_x not null
                                 ,block_y numeric(1) constraint nn_block_y not null
+                                ,board_id numeric constraint fk_board_id references INT_board(board_id)
                             );"""
             );
             // table: INT_board
@@ -93,7 +94,6 @@ public class _2048Application {
                             CREATE TABLE IF NOT EXISTS INT_board(
                                 board_id numeric constraint pk_boards primary key
                                 ,board_size numeric
-                                ,block_id numeric constraint fk_block_id references INT_blocks(block_id)
                             );"""
             );
             // table: INT_games

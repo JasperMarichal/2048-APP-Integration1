@@ -81,9 +81,9 @@ public class Game {
                 if(newPos == 0) continue;
                 //Check if we can combine the current block with the one underneath
                 // (numbers must match, and it cannot be an already combined block)
-                if(blocksArray[col][newPos-1].getNumber() == blocksArray[col][newPos].getNumber() && !alreadyCombined[newPos-1]) {
+                if(blocksArray[col][newPos-1].getValue() == blocksArray[col][newPos].getValue() && !alreadyCombined[newPos-1]) {
                     //Combine the current block with the one under it
-                    blocksArray[col][newPos-1].setNumber(blocksArray[col][newPos-1].getNumber() + blocksArray[col][newPos].getNumber());
+                    blocksArray[col][newPos-1].setValue(blocksArray[col][newPos-1].getValue() + blocksArray[col][newPos].getValue());
                     alreadyCombined[newPos-1] = true;
                     blocksArray[col][newPos] = null;
                 }

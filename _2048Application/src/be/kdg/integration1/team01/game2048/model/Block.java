@@ -1,19 +1,19 @@
 package be.kdg.integration1.team01.game2048.model;
 
 public class Block {
-    private int number;
+    private int value;
     private int positionX;
     private int positionY;
 
-    public Block(int number, int positionX, int positionY) {
-        this.number = number;
+    public Block(int value, int positionX, int positionY) {
+        this.value = value;
         this.positionX = positionX;
         this.positionY = positionY;
     }
 
-    public int getNumber() {return number;}
+    public int getValue() {return value;}
 
-    public void setNumber(int number) {this.number = number;}
+    public void setValue(int value) {this.value = value;}
 
     public int getPositionX() {return positionX;}
 

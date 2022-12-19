@@ -14,7 +14,7 @@ public class PlayerManager {
         ArrayList<Player> updatedList = new ArrayList<>();
         try {
             Statement retrievePlayers = connection.createStatement();
-            ResultSet allPlayers = retrievePlayers.executeQuery("SELECT player_name FROM int_players;");
+            ResultSet allPlayers = retrievePlayers.executeQuery("SELECT player_name FROM INT_players;");
             while (allPlayers.next()) {
                 updatedList.add(new Player(allPlayers.getString(1)));
             }

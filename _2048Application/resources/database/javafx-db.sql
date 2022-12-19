@@ -13,17 +13,17 @@ CREATE TABLE IF NOT EXISTS INT_leaderboard (
     ,duration interval constraint nn_duration not null
 );
 
+CREATE TABLE IF NOT EXISTS INT_board(
+    board_id numeric constraint pk_boards primary key
+    ,board_size numeric
+);
+
 CREATE TABLE IF NOT EXISTS INT_blocks(
     block_id numeric constraint pk_blocks primary key
     ,block_value numeric not null
     ,block_x numeric(1) constraint nn_block_x not null
     ,block_y numeric(1) constraint nn_block_y not null
-);
-
-CREATE TABLE IF NOT EXISTS INT_board(
-    board_id numeric constraint pk_boards primary key
-    ,board_size numeric
-    ,block_id numeric constraint fk_block_id references INT_blocks(block_id)
+    ,board_id numeric constraint fk_board_id references INT_board(board_id)
 );
 
 CREATE TABLE IF NOT EXISTS INT_games(
