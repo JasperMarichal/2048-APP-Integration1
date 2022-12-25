@@ -1,11 +1,13 @@
 package be.kdg.integration1.team01.game2048;
 
 import be.kdg.integration1.team01.game2048.manager.PlayerManager;
+import be.kdg.integration1.team01.game2048.manager.SaveManager;
 import be.kdg.integration1.team01.game2048.manager.WireframesManager;
 import be.kdg.integration1.team01.game2048.model.*;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class _2048Application {
@@ -28,18 +30,51 @@ public class _2048Application {
         keyboard.nextLine(); //Press enter to begin
 
         Player player = null;
-        int endMode = 1; //0 = quit, 1 = ask for player name again, 2 = same player, start new game
+        int endMode = 1; //0 = quit game, 1 = return to main menu, 2 = keep same player, start a new game
+
+        int currentMenu;
         do {
-            if(endMode == 1) {
-                player = PlayerManager.selectPlayerOrCreateNew(databaseConnection);
+            if(endMode == 2) {
+                currentMenu = 1;
+            }else {
+                currentMenu = selectFromMenu("Main Menu", new String[]{"New Game", "Load Save"}, "Quit Game");
             }
 
-            //GameSession object
-            Game gameState = new Game(4, player);
+            switch (currentMenu) {
+                case 0 -> endMode = 0;
+                case 1 -> {
+                    //NEW GAME
+                    //do not ask for player name in case of endMode 2, unless the player is somehow null.
+                    if(player == null || endMode != 2) {
+                        player = PlayerManager.selectPlayerOrCreateNew(databaseConnection);
+                    }
 
-            //Start the new game
-            endMode = gameState.play(databaseConnection);
-            System.out.println("\n\n\n");
+                    Game gameSession = new Game(4, player);
+                    endMode = gameSession.play(databaseConnection);
+                }
+                case 2 -> {
+                    //LOAD SAVE
+                    player = PlayerManager.selectExistingPlayer(databaseConnection);
+                    if(player == null) continue; //Player failed to select an existing player
+
+                    //Fetch a list of the saved games that this player has (database gameIds)
+                    ArrayList<Long> playerSaves = SaveManager.getSaveGamesOfPlayer(databaseConnection, player);
+
+                    //Fill the menu with the options
+                    String[] options = new String[playerSaves.size()];
+                    for (int i = 0; i < playerSaves.size(); i++) {
+                        options[i] = "Save #"+playerSaves.get(i);
+                    }
+                    //Let player select which of their save games they want to load
+                    int saveGameToLoad = selectFromMenu("Select Save To Load", options,"Cancel") - 1;
+                    if(saveGameToLoad == -1) continue; //Player selected "Cancel"
+
+                    Game gameSession = SaveManager.loadGame(databaseConnection, playerSaves.get(saveGameToLoad));
+                    if(gameSession == null) continue; //Game failed to load
+                    //Continue the game
+                    endMode = gameSession.play(databaseConnection);
+                }
+            }
         }while (endMode != 0);
 
         try {
@@ -47,6 +82,31 @@ public class _2048Application {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public static int selectFromMenu(String menuName, String[] menuOptions, String zeroOptionName) {
+        int selectedOption = -1;
+        do {
+            System.out.println("\n"+menuName+"\n");
+            for (int i = 0; i < menuOptions.length; i++) {
+                System.out.printf("%d - %s\n", i+1, menuOptions[i]);
+            }
+            System.out.println("\n0 - "+zeroOptionName);
+            System.out.print("Select option> ");
+            try {
+                selectedOption = keyboard.nextInt();
+                keyboard.nextLine();
+            }catch (InputMismatchException ignored) {
+                keyboard.nextLine();
+                System.out.println(menuName+": Select the desired option by typing in its number.");
+            }
+
+            if(selectedOption > menuOptions.length || selectedOption < 0) {
+                System.out.println(menuName+": Invalid option!");
+                selectedOption = -1;
+            }
+        }while (selectedOption == -1);
+        return selectedOption;
     }
 
     public static Connection initializeDatabase() {

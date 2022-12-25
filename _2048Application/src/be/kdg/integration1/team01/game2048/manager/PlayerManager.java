@@ -82,4 +82,21 @@ public class PlayerManager {
         }while (player == null);
         return player;
     }
+
+    public static Player selectExistingPlayer(Connection connection) {
+        Player player = null;
+        players = updatePlayersList(connection);
+        do {
+            System.out.print("Enter your name: ");
+            String playerName = _2048Application.keyboard.nextLine();
+            if(playerName.isEmpty()) {
+                System.out.print("Return without selecting a player? (y/N) ");
+                if(_2048Application.keyboard.nextLine().equalsIgnoreCase("Y")) return null;
+            }else {
+                player = findPlayerByName(playerName);
+                if(player == null) System.err.println("This player does not exist! Select an existing player.");
+            }
+        }while (player == null);
+        return player;
+    }
 }
