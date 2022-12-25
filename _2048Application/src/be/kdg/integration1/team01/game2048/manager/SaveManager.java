@@ -159,4 +159,9 @@ public class SaveManager {
         }
         return null;
     }
+
+    public static ArrayList<Long> getSaveGamesOfPlayer(Connection databaseConnection, Player player) {
+        //TODO: Boldi will watch Jasper implement this :D
+        return new ArrayList<>();
+    }
 }
