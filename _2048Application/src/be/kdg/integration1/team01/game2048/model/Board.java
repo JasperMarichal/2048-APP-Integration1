@@ -11,6 +11,10 @@ public class Board {
         this.size = size;
         this.blocks = new ArrayList<>();
     }
+    public Board(int size, ArrayList<Block> blocks) {
+        this.size = size;
+        this.blocks = blocks;
+    }
 
     public int getSize() {return size;}
     public void setSize(int size) {this.size = size;}

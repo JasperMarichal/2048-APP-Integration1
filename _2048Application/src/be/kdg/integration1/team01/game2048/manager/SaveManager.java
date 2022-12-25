@@ -122,7 +122,7 @@ public class SaveManager {
             ResultSet boardEntry = getBoard.executeQuery();
 
             if (boardEntry.next()) {
-                return new Board(boardEntry.getInt(1));
+                return new Board(boardEntry.getInt(1),loadBlock(connection, boardId));
             }
 
         } catch (SQLException e) {
@@ -132,7 +132,7 @@ public class SaveManager {
         return null;
     }
 
-    public static Block loadBlock(Connection connection, long boardId){
+    public static ArrayList<Block> loadBlock(Connection connection, long boardId){
         try {
             PreparedStatement getBlock = connection.prepareStatement(
                     """
@@ -147,11 +147,14 @@ public class SaveManager {
             getBlock.setLong(1, boardId);
             ResultSet blockEntry = getBlock.executeQuery();
 
+            ArrayList<Block> blockArrayList = new ArrayList<>();
+
             while(blockEntry.next()) {
-                return new Block(blockEntry.getInt(2)
-                ,blockEntry.getInt(3)
-                ,blockEntry.getInt(4));
+                blockArrayList.add(new Block(blockEntry.getInt(1)
+                ,blockEntry.getInt(2)
+                ,blockEntry.getInt(3)));
             }
+            return blockArrayList;
 
         }catch (SQLException e) {
             System.err.println("Load Block; Loading of the block failed");
@@ -162,6 +165,30 @@ public class SaveManager {
 
     public static ArrayList<Long> getSaveGamesOfPlayer(Connection databaseConnection, Player player) {
         //TODO: Boldi will watch Jasper implement this :D
+        try {
+            PreparedStatement getSaveGamesOfPlayer = databaseConnection.prepareStatement(
+                    """
+                        SELECT g.game_id
+                        FROM int_players p 
+                        JOIN int_games g on p.player_name = g.player_name
+                        WHERE p.player_name = ?;
+                        """
+            );
+            getSaveGamesOfPlayer.setString(1, player.getName());
+            ResultSet blockEntry = getSaveGamesOfPlayer.executeQuery();
+
+            ArrayList<Long> Arr = new ArrayList<Long>();
+
+            while(blockEntry.next()) {
+                Arr.add(blockEntry.getLong(1));
+            }
+            return Arr;
+
+        }catch (SQLException e) {
+            System.err.println("Load Block; Loading of the block failed");
+            e.printStackTrace();
+        }
+
         return new ArrayList<>();
     }
 }
