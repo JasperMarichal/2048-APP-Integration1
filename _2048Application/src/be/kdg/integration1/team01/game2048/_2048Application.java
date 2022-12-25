@@ -50,7 +50,7 @@ public class _2048Application {
                     }
 
                     Game gameSession = new Game(4, player);
-                    endMode = gameSession.play(databaseConnection);
+                    endMode = gameSession.play(databaseConnection, true);
                 }
                 case 2 -> {
                     //LOAD SAVE
@@ -72,7 +72,7 @@ public class _2048Application {
                     Game gameSession = SaveManager.loadGame(databaseConnection, playerSaves.get(saveGameToLoad));
                     if(gameSession == null) continue; //Game failed to load
                     //Continue the game
-                    endMode = gameSession.play(databaseConnection);
+                    endMode = gameSession.play(databaseConnection, false);
                 }
             }
         }while (endMode != 0);

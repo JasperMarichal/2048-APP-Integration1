@@ -100,13 +100,13 @@ public class Game {
         }
     }
 
-    public int play(Connection connection) {
+    public int play(Connection connection, boolean isBeginning) {
         Scanner keyboard = new Scanner(System.in);
         LocalDateTime start_datetime = LocalDateTime.now();
 
         String command = "";
 
-        board.addBlocksRandomly(2,2); // adds two 2's to begin with
+        if(isBeginning) board.addBlocksRandomly(2,2); // adds two 2's to begin with
         displayWireframe(Wireframe.GAMEBOARD, this); // Show initial board state
 
         running = true;
@@ -116,7 +116,7 @@ public class Game {
                 System.out.print("> ");
                 command = keyboard.nextLine().toUpperCase();
             }
-            // The process command can return the next command in some cases
+            // processCommand can return the next command in some cases
             String nextCommand = processCommand(command, connection);
 
             if (running) {
@@ -124,27 +124,27 @@ public class Game {
                 displayWireframe(Wireframe.GAMEBOARD, this);
             }
         }while (running);
-        // End game results
+        // Calculate game results
         Duration totalGameDuration = Duration.between(start_datetime, LocalDateTime.now());
         LeaderboardEntry finalResult = new LeaderboardEntry(getCurrentScore(), getCurrentPlayer().getName(), start_datetime, totalGameDuration);
 
+        // Display game results
         System.out.printf("Thanks for playing, %s!\nEnd score: %d\nTime: %d seconds\n", finalResult.getPlayerName(), finalResult.getScore(), finalResult.getDuration().getSeconds());
 
         System.out.print("Do you wish to save this score? (y/N) ");
         if(keyboard.nextLine().equalsIgnoreCase("Y")) {
-            //TODO: save score
             if(LeaderboardManager.saveAttempt(connection, finalResult)) {
                 System.out.println("Score saved!");
             }
         }
 
-        //Ask player if they want to play again unless they already entered the new game command
+        //Ask player if they want to return to the menu unless they already entered the new game command
         if(command.equalsIgnoreCase("N")) {
-            return 1;
+            return 2;
         }else {
-            System.out.print("Do you want to play again? (y/N) ");
+            System.out.print("Do you want to return to the Main Menu? (y/N) ");
             if(keyboard.nextLine().equalsIgnoreCase("Y")) {
-                return 2;
+                return 1;
             }
             return 0;
         }

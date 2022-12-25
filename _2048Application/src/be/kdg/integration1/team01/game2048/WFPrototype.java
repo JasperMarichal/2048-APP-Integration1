@@ -24,7 +24,7 @@ public class WFPrototype {
             Game gameSession = new Game(4, player);
 
             //Start the new game
-            endMode = gameSession.play(null);
+            endMode = gameSession.play(null, true);
         }while (endMode != 0);
     }
 }
