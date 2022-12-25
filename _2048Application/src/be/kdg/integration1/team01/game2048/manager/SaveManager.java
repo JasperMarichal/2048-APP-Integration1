@@ -112,8 +112,7 @@ public class SaveManager {
             PreparedStatement getBoard = connection.prepareStatement(
                     """ 
                             SELECT
-                            board_id
-                            ,board_size
+                            board_size
                             FROM int_board
                             WHERE board_id = ?;
                         """
