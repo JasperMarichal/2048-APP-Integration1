@@ -87,7 +87,9 @@ public class WireframesManager {
                 if (activeSession == null) {
                     yield "ERROR: Cannot display board without a game-session provided.";
                 } else {
-                    yield   "Score: %,d  Turn: %d\n".formatted(activeSession.getCurrentScore(), activeSession.getTurns().size()) +
+                    yield   "Score: %,d  Turn: %d GameId: &d\n".formatted(activeSession.getCurrentScore()
+                            , activeSession.getTurns().size()
+                            , activeSession.getGameId()) +
                             activeSession.getBoard().toString() +
                             "Type 0 or 1 or 2 or 3 to slide the title up/right/down/left!\n" +
                             "Otherwise H for “Help” or Q to stop the game\n";

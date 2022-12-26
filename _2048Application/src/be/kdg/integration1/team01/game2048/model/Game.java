@@ -1,5 +1,6 @@
 package be.kdg.integration1.team01.game2048.model;
 
+import be.kdg.integration1.team01.game2048._2048Application;
 import be.kdg.integration1.team01.game2048.manager.LeaderboardManager;
 import be.kdg.integration1.team01.game2048.manager.SaveManager;
 
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Game {
+    private int gameId;
     private int currentScore;
     private ArrayList<Turn> turns;
     private Board board;
@@ -32,6 +34,23 @@ public class Game {
         this.board = board;
         this.currentPlayer = currentPlayer;
         this.running = running;
+    }
+
+    public Game(int gameId, int currentScore, ArrayList<Turn> turns, Board board, Player currentPlayer, boolean running) {
+        this.gameId = gameId;
+        this.currentScore = currentScore;
+        this.turns = turns;
+        this.board = board;
+        this.currentPlayer = currentPlayer;
+        this.running = running;
+    }
+
+    public int getGameId() {
+        return gameId;
+    }
+
+    public void setGameId(int gameId) {
+        this.gameId = gameId;
     }
 
     public Player getCurrentPlayer() {
@@ -137,6 +156,28 @@ public class Game {
                 System.out.println("Score saved!");
             }
         }
+        // This is the code to save an active game
+        /*
+       Game currentResult = new Game(
+                getGameId()
+               ,getCurrentScore()
+                ,getTurns()
+                ,getBoard()
+                ,getCurrentPlayer()
+                ,true);
+
+
+        // Display game results
+        System.out.printf("Thanks for playing, %s!\nEnd score: %d\nTime: %d seconds\n"
+                , currentResult.getCurrentPlayer().getName(), currentResult.getCurrentScore(), totalGameDuration.getSeconds());
+
+        System.out.print("Do you wish to save this score? (y/N) ");
+        if(keyboard.nextLine().equalsIgnoreCase("Y")) {
+            if(SaveManager.saveGame(connection, currentResult)) {
+                System.out.println("Score saved!");
+            }
+        }*/
+
 
         //Ask player if they want to return to the menu unless they already entered the new game command
         if(command.equalsIgnoreCase("N")) {

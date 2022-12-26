@@ -12,7 +12,11 @@ public class SaveManager {
     public static long saveBoard(Connection connection, Board board) {
         try {
             PreparedStatement insertAttempt = connection.prepareStatement(
-                    "INSERT INTO int_board (board_size) VALUES (?)"
+                    """
+                    INSERT INTO int_board (
+                    board_size) 
+                    VALUES (?);
+                    """
                     , PreparedStatement.RETURN_GENERATED_KEYS
             );
             insertAttempt.setInt(1, board.getSize());
@@ -30,7 +34,6 @@ public class SaveManager {
                 throw new SQLException("Save game: Failed to save board to database");
                 }
             }
-
         } catch (SQLException e) {
             System.err.println("Save game: Failed to save board to database");
             e.printStackTrace();
@@ -43,8 +46,16 @@ public class SaveManager {
             if(board_id == -1){
                 throw new SQLException("Save game: Failed to save board to database");
             }
+            if(game.getGameId() <= 0){
             PreparedStatement insertAttempt = connection.prepareStatement(
-                    "INSERT INTO int_games (player_name, current_score, current_turn, board_id) VALUES (?, ?, ?, ?)"
+                    """
+                            INSERT INTO int_games (
+                            player_name
+                            , current_score
+                            , current_turn
+                            , board_id) 
+                            VALUES (?, ?, ?, ?);
+                            """
             );
             insertAttempt.setString(1, game.getCurrentPlayer().getName());
             insertAttempt.setInt(2, game.getCurrentScore());
@@ -52,17 +63,47 @@ public class SaveManager {
             insertAttempt.setLong(4, board_id);
             insertAttempt.executeUpdate();
             return true;
+            }
+            if(game.getGameId() > 0){
+                PreparedStatement insertAttempt = connection.prepareStatement(
+                        """
+                                UPDATE int_games SET (
+                                player_name
+                                , current_score
+                                , current_turn
+                                , board_id)
+                                = (?, ?, ?, ?)
+                                WHERE game_id = ?;
+                                """
+                );
+                insertAttempt.setString(1, game.getCurrentPlayer().getName());
+                insertAttempt.setInt(2, game.getCurrentScore());
+                insertAttempt.setInt(3, game.getTurns().size());
+                insertAttempt.setLong(4, board_id);
+                insertAttempt.setInt(5, game.getGameId());
+                insertAttempt.executeUpdate();
+                return true;
+            }
         } catch (SQLException e) {
             System.err.println("Game: Failed to save game to database");
             e.printStackTrace();
             return false;
         }
+        return false;
     }
+
     public static boolean saveBlock(Connection connection, Block block, long board_id) {
         try {
 
             PreparedStatement insertAttempt = connection.prepareStatement(
-                    "INSERT INTO int_blocks (block_value, block_x, block_y, board_id) VALUES (?, ?, ?, ?)"
+                    """
+                            INSERT INTO int_blocks (
+                            block_value
+                            , block_x
+                            , block_y
+                            , board_id) 
+                            VALUES (?, ?, ?, ?);
+                           """
             );
             insertAttempt.setInt(1, block.getValue());
             insertAttempt.setInt(2, block.getPositionX());
@@ -82,8 +123,9 @@ public class SaveManager {
 
             PreparedStatement getGame = connection.prepareStatement(
                     """ 
-                            SELECT current_score
-                            , current_turn
+                            SELECT game_id
+                            ,current_score
+                            ,current_turn
                             ,board_id
                             ,player_name 
                             FROM int_games WHERE game_id = ?;
@@ -94,9 +136,10 @@ public class SaveManager {
 
             if (gameEntry.next()) {
                 return new Game(gameEntry.getInt(1)
+                        ,gameEntry.getInt(2)
                         , new ArrayList<>()
-                        , loadBoard(connection, gameEntry.getLong(3))
-                        , PlayerManager.findPlayerByName(gameEntry.getString(4))
+                        , loadBoard(connection, gameEntry.getLong(4))
+                        , PlayerManager.findPlayerByName(gameEntry.getString(5))
                         , true);
             }
 
@@ -163,7 +206,6 @@ public class SaveManager {
     }
 
     public static ArrayList<Long> getSaveGamesOfPlayer(Connection databaseConnection, Player player) {
-        //TODO: Boldi will watch Jasper implement this :D
         try {
             PreparedStatement getSaveGamesOfPlayer = databaseConnection.prepareStatement(
                     """
@@ -184,7 +226,7 @@ public class SaveManager {
             return Arr;
 
         }catch (SQLException e) {
-            System.err.println("Load Block; Loading of the block failed");
+            System.err.println("GetSaveGamesOfPlayer; Loading of the SaveGamesOfPlayer failed");
             e.printStackTrace();
         }
 
