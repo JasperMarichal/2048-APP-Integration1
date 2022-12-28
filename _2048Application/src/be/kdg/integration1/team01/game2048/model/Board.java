@@ -57,7 +57,7 @@ public class Board {
      */
     public Block[][] getGeneralArray(Direction slideDirection) {
         Block[][] arr = new Block[size][size];
-        for(Block block : blocks) {
+        for(Block block : getBlocks()) {
             int generalX = switch (slideDirection) {
                 case UP -> (size-1)-block.getPositionX();
                 case RIGHT -> (size-1)-block.getPositionY();
@@ -70,9 +70,39 @@ public class Board {
                 case DOWN -> (size-1)-block.getPositionY();
                 case LEFT -> block.getPositionX();
             };
-            arr[generalX][generalY] = block;
+            arr[generalX][generalY] = new Block(block); //Make sure to store a copy of block or funky stuff will happen
         }
         return arr;
+    }
+
+    public static Block[][] slideGeneralArray(Block[][] blocksArray) {
+        for (int col = 0; col < blocksArray.length; col++) {
+            boolean[] alreadyCombined = new boolean[blocksArray.length];
+            for (int row = 1; row < blocksArray[col].length; row++) {
+                if(blocksArray[col][row] == null) continue; //skips to next cell if this cell is empty
+                int newPos = row;
+                // move "down" until we hit another block or the wall
+                while (newPos > 0 && blocksArray[col][newPos-1] == null) {
+                    newPos--;
+                }
+                //Actually move the block to the new position (copy to newPos remove from old)
+                if(newPos != row) {
+                    blocksArray[col][newPos] = blocksArray[col][row];
+                    blocksArray[col][row] = null;
+                }
+                // If there is no block underneath we can skip to the next cell
+                if(newPos == 0) continue;
+                //Check if we can combine the current block with the one underneath
+                // (numbers must match, and it cannot be an already combined block)
+                if(blocksArray[col][newPos-1].getValue() == blocksArray[col][newPos].getValue() && !alreadyCombined[newPos-1]) {
+                    //Combine the current block with the one under it
+                    blocksArray[col][newPos-1].setValue(blocksArray[col][newPos-1].getValue() + blocksArray[col][newPos].getValue());
+                    alreadyCombined[newPos-1] = true;
+                    blocksArray[col][newPos] = null;
+                }
+            }
+        }
+        return blocksArray;
     }
 
     /**
@@ -104,20 +134,47 @@ public class Board {
         }
     }
 
-    public void addBlocksRandomly(int value, int numberOfBlocks) {
-        Random rng = new Random();
-        Block[][] blocksArray = getArray();
-        //New method
-        //find all empty cells
-        ArrayList<int[]> emptyCells = new ArrayList<>();
+    public boolean isSlideable() {
+        //Check if the board can be moved in ANY of the four directions
+        for(Direction slideDirection : Direction.values()) {
+            Block[][] slidedArray = slideGeneralArray(getGeneralArray(slideDirection));
+            //Check if the board differs after sliding
+            if(doBlockArraysDiffer(slidedArray, getGeneralArray(slideDirection))) return true;
+        }
+        return false;
+    }
 
-        for (int x = 0; x < size; x++) {
-            for (int y = 0; y < size; y++) {
+    public static boolean doBlockArraysDiffer(Block[][] array, Block[][] brray) {
+        for (int x = 0; x < array.length; x++) {
+            for (int y = 0; y < array[x].length; y++) {
+                if(array[x][y] == null || brray[x][y] == null) {
+                    if(!(array[x][y] == null && brray[x][y] == null)) return true;
+                }else {
+                    if(array[x][y].getValue() != brray[x][y].getValue()) return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public static ArrayList<int[]> getPositionsOfEmptyCells(Block[][] blocksArray) {
+        ArrayList<int[]> emptyCells = new ArrayList<>();
+        for (int x = 0; x < blocksArray.length; x++) {
+            for (int y = 0; y < blocksArray[x].length; y++) {
                 if(blocksArray[x][y] == null) {
                     emptyCells.add(new int[]{x, y});
                 }
             }
         }
+        return emptyCells;
+    }
+
+    public void addBlocksRandomly(int value, int numberOfBlocks) {
+        Random rng = new Random();
+        Block[][] blocksArray = getArray();
+        //New method
+        //find all empty cells
+        ArrayList<int[]> emptyCells = getPositionsOfEmptyCells(blocksArray);
         //pick <numberOfBlocks> of these cells to fill in
         for (int i = 0; i < numberOfBlocks; i++) {
             if(emptyCells.size() == 0) break;
@@ -126,17 +183,7 @@ public class Board {
             blocksArray[pos[0]][pos[1]] = new Block(value, pos[0], pos[1]);
             emptyCells.remove(r);
         }
-
-        //Old method
-//        int rx, ry;
-//        while (numberOfBlocks > 0) {
-//            rx = rng.nextInt(0, size);
-//            ry = rng.nextInt(0, size);
-//            if(blocksArray[rx][ry] == null) {
-//                blocksArray[rx][ry] = new Block(value, rx, ry);
-//                numberOfBlocks--;
-//            }
-//        }
+        //Update board from the array
         fromArray(blocksArray);
     }
 

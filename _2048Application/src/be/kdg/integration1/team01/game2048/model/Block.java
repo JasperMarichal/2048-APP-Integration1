@@ -11,6 +11,12 @@ public class Block {
         this.positionY = positionY;
     }
 
+    public Block(Block copyOf) {
+        this.value = copyOf.getValue();
+        this.positionX = copyOf.getPositionX();
+        this.positionY = copyOf.getPositionY();
+    }
+
     public int getValue() {return value;}
 
     public void setValue(int value) {this.value = value;}

@@ -1,16 +1,15 @@
 package be.kdg.integration1.team01.game2048.model;
 
-import be.kdg.integration1.team01.game2048._2048Application;
 import be.kdg.integration1.team01.game2048.manager.LeaderboardManager;
 import be.kdg.integration1.team01.game2048.manager.SaveManager;
-
-import static be.kdg.integration1.team01.game2048.manager.WireframesManager.displayWireframe;
 
 import java.sql.Connection;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Scanner;
+
+import static be.kdg.integration1.team01.game2048.manager.WireframesManager.displayWireframe;
 
 public class Game {
     private int gameId;
@@ -26,14 +25,6 @@ public class Game {
         this.board = new Board(boardSize);
         this.running = false;
         setCurrentPlayer(player);
-    }
-
-    public Game(int currentScore, ArrayList<Turn> turns, Board board, Player currentPlayer, boolean running) {
-        this.currentScore = currentScore;
-        this.turns = turns;
-        this.board = board;
-        this.currentPlayer = currentPlayer;
-        this.running = running;
     }
 
     public Game(int gameId, int currentScore, ArrayList<Turn> turns, Board board, Player currentPlayer, boolean running) {
@@ -75,49 +66,19 @@ public class Game {
     public Board getBoard() {return board;}
     public void setBoard(Board board) {this.board = board;}
 
-    public boolean isRunning() {
-        return running;
-    }
     public void makeMove(Direction slideDirection) {
         //generalize board into a 2D array
         Block[][] blocksArray = board.getGeneralArray(slideDirection);
         //simulate sliding
-        slideBoard(blocksArray);
+        Block[][] slidedArray = Board.slideGeneralArray(blocksArray);
         //update board
-        board.updateFromGeneralArray(blocksArray, slideDirection);
-        //TODO: end turn etc.
+        board.updateFromGeneralArray(slidedArray, slideDirection);
+        //End turn
         turns.add(new Turn(slideDirection));
-        board.addBlocksRandomly(2,1);
+        //Generate a new random block on the board
+        board.addBlocksRandomly(2, 1);
     }
 
-    private void slideBoard(Block[][] blocksArray) {
-        for (int col = 0; col < board.getSize(); col++) {
-            boolean[] alreadyCombined = new boolean[board.getSize()];
-            for (int row = 1; row < board.getSize(); row++) {
-                if(blocksArray[col][row] == null) continue; //skips to next cell if this cell is empty
-                int newPos = row;
-                // move "down" until we hit another block or the wall
-                while (newPos > 0 && blocksArray[col][newPos-1] == null) {
-                    newPos--;
-                }
-                //Actually move the block to the new position (copy to newPos remove from old)
-                if(newPos != row) {
-                    blocksArray[col][newPos] = blocksArray[col][row];
-                    blocksArray[col][row] = null;
-                }
-                // If there is no block underneath we can skip to the next cell
-                if(newPos == 0) continue;
-                //Check if we can combine the current block with the one underneath
-                // (numbers must match, and it cannot be an already combined block)
-                if(blocksArray[col][newPos-1].getValue() == blocksArray[col][newPos].getValue() && !alreadyCombined[newPos-1]) {
-                    //Combine the current block with the one under it
-                    blocksArray[col][newPos-1].setValue(blocksArray[col][newPos-1].getValue() + blocksArray[col][newPos].getValue());
-                    alreadyCombined[newPos-1] = true;
-                    blocksArray[col][newPos] = null;
-                }
-            }
-        }
-    }
 
     public int play(Connection connection, boolean isBeginning) {
         Scanner keyboard = new Scanner(System.in);
@@ -137,47 +98,50 @@ public class Game {
             }
             // processCommand can return the next command in some cases
             String nextCommand = processCommand(command, connection);
+            //LOSE CONDITION CHECK
+            //if board is full and if the board cannot be slided in any direction
+            if(board.getBlocks().size() == board.getSize()*board.getSize() && !board.isSlideable()) {
+                running = false;
+            }
 
             if (running) {
                 command = nextCommand;
                 displayWireframe(Wireframe.GAMEBOARD, this);
             }
         }while (running);
-        // Calculate game results
-        Duration totalGameDuration = Duration.between(start_datetime, LocalDateTime.now());
-        LeaderboardEntry finalResult = new LeaderboardEntry(getCurrentScore(), getCurrentPlayer().getName(), start_datetime, totalGameDuration);
 
-        // Display game results
-        System.out.printf("Thanks for playing, %s!\nEnd score: %d\nTime: %d seconds\n", finalResult.getPlayerName(), finalResult.getScore(), finalResult.getDuration().getSeconds());
+        //CHECK IF THE GAME ENDED OR IT CAN BE CONTINUED LATER
+        if(board.isSlideable()) {
+            //GAME CAN BE CONTINUED
+            if(getGameId() > 0) {
+                System.out.print("Update game save (otherwise this sessions progress will be lost)? (Y/n) ");
+            }else {
+                System.out.print("Save game (so you can continue later)? (Y/n) ");
+            }
+            if(!keyboard.nextLine().equalsIgnoreCase("N")) {
+                if(SaveManager.saveGame(connection, this)) {
+                    System.out.println("Game saved successfully! \n(To continue it later select \"Load Save\" from the Main Menu.)\n");
+                }else {
+                    System.err.println("ERROR: Failed to save game!\n");
+                }
+            }
+        }else {
+            //GAME OVER
+            // Calculate game results
+            Duration totalGameDuration = Duration.between(start_datetime, LocalDateTime.now());
+            LeaderboardEntry finalResult = new LeaderboardEntry(getCurrentScore(), getCurrentPlayer().getName(), start_datetime, totalGameDuration);
 
-        System.out.print("Do you wish to save this score? (y/N) ");
-        if(keyboard.nextLine().equalsIgnoreCase("Y")) {
-            if(LeaderboardManager.saveAttempt(connection, finalResult)) {
-                System.out.println("Score saved!");
+            // Display final game results
+            System.out.println(board.toString());
+            System.out.printf("Thanks for playing, %s!\nEnd score: %d\nTime: %d seconds\n", finalResult.getPlayerName(), finalResult.getScore(), finalResult.getDuration().getSeconds());
+
+            System.out.print("Do you wish to save this score? (y/N) ");
+            if(keyboard.nextLine().equalsIgnoreCase("Y")) {
+                if(LeaderboardManager.saveAttempt(connection, finalResult)) {
+                    System.out.println("Score saved!");
+                }
             }
         }
-        // This is the code to save an active game
-        /*
-       Game currentResult = new Game(
-                getGameId()
-               ,getCurrentScore()
-                ,getTurns()
-                ,getBoard()
-                ,getCurrentPlayer()
-                ,true);
-
-
-        // Display game results
-        System.out.printf("Thanks for playing, %s!\nEnd score: %d\nTime: %d seconds\n"
-                , currentResult.getCurrentPlayer().getName(), currentResult.getCurrentScore(), totalGameDuration.getSeconds());
-
-        System.out.print("Do you wish to save this score? (y/N) ");
-        if(keyboard.nextLine().equalsIgnoreCase("Y")) {
-            if(SaveManager.saveGame(connection, currentResult)) {
-                System.out.println("Score saved!");
-            }
-        }*/
-
 
         //Ask player if they want to return to the menu unless they already entered the new game command
         if(command.equalsIgnoreCase("N")) {
