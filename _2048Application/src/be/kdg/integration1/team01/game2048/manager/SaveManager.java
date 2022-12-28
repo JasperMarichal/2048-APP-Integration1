@@ -9,30 +9,58 @@ import java.util.ArrayList;
 import static be.kdg.integration1.team01.game2048._2048Application.leaderboard;
 
 public class SaveManager {
-    public static long saveBoard(Connection connection, Board board) {
+    //SaveGame methods
+    public static long saveBoard(Connection connection, Board board, Game game) {
         try {
-            PreparedStatement insertAttempt = connection.prepareStatement(
-                    """
-                    INSERT INTO int_board (
-                    board_size) 
-                    VALUES (?);
-                    """
-                    , PreparedStatement.RETURN_GENERATED_KEYS
-            );
-            insertAttempt.setInt(1, board.getSize());
-            insertAttempt.executeUpdate();
+            if(game.getGameId() <= 0){
+                PreparedStatement insertAttempt = connection.prepareStatement(
+                        """
+                        INSERT INTO int_board (
+                        board_size) 
+                        VALUES (?);
+                        """
+                        , PreparedStatement.RETURN_GENERATED_KEYS
+                );
+                insertAttempt.setInt(1, board.getSize());
+                insertAttempt.executeUpdate();
 
-            try (ResultSet generatedKeys = insertAttempt.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    long id = generatedKeys.getLong(1);
-                    for (Block block : board.getBlocks()) {
-                        saveBlock(connection, block, id);
+                try (ResultSet generatedKeys = insertAttempt.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        long id = generatedKeys.getLong(1);
+                        for (Block block : board.getBlocks()) {
+                            saveBlock(connection, block, id);
+                        }
+                        return id;
                     }
-                    return id;
+                    else{
+                        throw new SQLException("Save game: Failed to save board to database");
+                    }
+                }
+            }
+            else if(game.getGameId() > 0){
+                PreparedStatement getBoard = connection.prepareStatement(
+                        """
+                        SELECT ib.board_id 
+                        FROM int_board ib
+                        JOIN int_games ig on ib.board_id = ig.board_id
+                        WHERE ib.board_id = ig.board_id
+                        AND ig.game_id = ?;
+                        """
+                );
+                getBoard.setLong(1, game.getGameId());
+                ResultSet boardEntry = getBoard.executeQuery();
+                if (boardEntry.next()) {
+                        long id = boardEntry.getLong(1);
+                        for (Block block : board.getBlocks()) {
+                            saveBlock(connection, block, id);
+                        }
+                        return id;
                 }
                 else{
-                throw new SQLException("Save game: Failed to save board to database");
+                    throw new SQLException("Save game: Failed to save board to database");
                 }
+            }else{
+                throw new SQLException("Save game: Failed to save board to database");
             }
         } catch (SQLException e) {
             System.err.println("Save game: Failed to save board to database");
@@ -42,7 +70,8 @@ public class SaveManager {
     }
     public static boolean saveGame(Connection connection, Game game) {
         try {
-            long board_id = saveBoard(connection, game.getBoard());
+            deleteBlocks(connection, game);
+            long board_id = saveBoard(connection, game.getBoard(), game);
             if(board_id == -1){
                 throw new SQLException("Save game: Failed to save board to database");
             }
@@ -64,7 +93,7 @@ public class SaveManager {
             insertAttempt.executeUpdate();
             return true;
             }
-            if(game.getGameId() > 0){
+            else if(game.getGameId() > 0){
                 PreparedStatement insertAttempt = connection.prepareStatement(
                         """
                                 UPDATE int_games SET (
@@ -84,17 +113,36 @@ public class SaveManager {
                 insertAttempt.executeUpdate();
                 return true;
             }
+            else{
+                throw new SQLException("Save game: Failed to save game to database");
+            }
         } catch (SQLException e) {
             System.err.println("Game: Failed to save game to database");
             e.printStackTrace();
             return false;
         }
-        return false;
     }
-
+    public static boolean deleteBlocks(Connection connection, Game game){
+        //This method is used to delete previous blocks used in the game board.
+        try {
+            PreparedStatement deleteAttempt = connection.prepareStatement(
+                    """
+                            DELETE FROM int_blocks b WHERE b.board_id 
+                            IN (SELECT g.board_id FROM int_games g
+                            WHERE g.game_id = ?);
+                            """
+            );
+            deleteAttempt.setInt(1,game.getGameId());
+            deleteAttempt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            System.err.println("Block: Failed to delete blocks from database");
+            e.printStackTrace();
+            return false;
+        }
+    }
     public static boolean saveBlock(Connection connection, Block block, long board_id) {
         try {
-
             PreparedStatement insertAttempt = connection.prepareStatement(
                     """
                             INSERT INTO int_blocks (
@@ -118,6 +166,7 @@ public class SaveManager {
         }
     }
 
+    //LoadGame methods
     public static Game loadGame(Connection connection, long gameId) {
         try {
 
