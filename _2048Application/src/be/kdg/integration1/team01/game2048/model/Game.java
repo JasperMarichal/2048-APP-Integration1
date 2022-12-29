@@ -114,15 +114,15 @@ public class Game {
         if(board.isSlideable()) {
             //GAME CAN BE CONTINUED
             if(getGameId() > 0) {
-                System.out.print("Update game save (otherwise this sessions progress will be lost)? (Y/n) ");
+                System.out.print("Update game save (otherwise this session's progress will be lost)? (Y/n) ");
             }else {
-                System.out.print("Save game (so you can continue later)? (Y/n) ");
+                System.out.print("Do you wish to Save the Game (so you can continue later)? (Y/n) ");
             }
             if(!keyboard.nextLine().equalsIgnoreCase("N")) {
                 if(SaveManager.saveGame(connection, this)) {
                     System.out.println("Game saved successfully! \n(To continue it later select \"Load Save\" from the Main Menu.)\n");
                 }else {
-                    System.err.println("ERROR: Failed to save game!\n");
+                    System.err.println("ERROR: Failed to save the game!\n");
                 }
             }
         }else {
