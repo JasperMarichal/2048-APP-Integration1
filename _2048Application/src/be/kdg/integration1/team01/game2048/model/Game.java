@@ -69,10 +69,10 @@ public class Game {
     public void makeMove(Direction slideDirection) {
         //generalize board into a 2D array
         Block[][] blocksArray = board.getGeneralArray(slideDirection);
-        //simulate sliding
-        Block[][] slidedArray = Board.slideGeneralArray(blocksArray);
+        //simulate sliding on array and increase score
+        currentScore += Board.slideGeneralArray(blocksArray);
         //update board
-        board.updateFromGeneralArray(slidedArray, slideDirection);
+        board.updateFromGeneralArray(blocksArray, slideDirection);
         //End turn
         turns.add(new Turn(slideDirection));
         //Generate a new random block on the board

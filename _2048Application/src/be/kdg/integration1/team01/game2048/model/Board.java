@@ -75,7 +75,8 @@ public class Board {
         return arr;
     }
 
-    public static Block[][] slideGeneralArray(Block[][] blocksArray) {
+    public static int slideGeneralArray(Block[][] blocksArray) {
+        int scoreIncrease = 0;
         for (int col = 0; col < blocksArray.length; col++) {
             boolean[] alreadyCombined = new boolean[blocksArray.length];
             for (int row = 1; row < blocksArray[col].length; row++) {
@@ -96,13 +97,15 @@ public class Board {
                 // (numbers must match, and it cannot be an already combined block)
                 if(blocksArray[col][newPos-1].getValue() == blocksArray[col][newPos].getValue() && !alreadyCombined[newPos-1]) {
                     //Combine the current block with the one under it
-                    blocksArray[col][newPos-1].setValue(blocksArray[col][newPos-1].getValue() + blocksArray[col][newPos].getValue());
+                    int combinedValue = blocksArray[col][newPos-1].getValue() + blocksArray[col][newPos].getValue();
+                    blocksArray[col][newPos-1].setValue(combinedValue);
                     alreadyCombined[newPos-1] = true;
                     blocksArray[col][newPos] = null;
+                    scoreIncrease += combinedValue;
                 }
             }
         }
-        return blocksArray;
+        return scoreIncrease;
     }
 
     /**
@@ -137,7 +140,8 @@ public class Board {
     public boolean isSlideable() {
         //Check if the board can be moved in ANY of the four directions
         for(Direction slideDirection : Direction.values()) {
-            Block[][] slidedArray = slideGeneralArray(getGeneralArray(slideDirection));
+            Block[][] slidedArray = getGeneralArray(slideDirection);
+            slideGeneralArray(slidedArray);
             //Check if the board differs after sliding
             if(doBlockArraysDiffer(slidedArray, getGeneralArray(slideDirection))) return true;
         }
