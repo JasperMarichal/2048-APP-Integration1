@@ -21,7 +21,7 @@ public class Game {
 
     public Game(int boardSize, Player player) {
         this.currentScore = 0;
-        this.turns = new ArrayList<Turn>();
+        this.turns = new ArrayList<>();
         this.board = new Board(boardSize);
         this.running = false;
         setCurrentPlayer(player);
@@ -40,10 +40,6 @@ public class Game {
         return gameId;
     }
 
-    public void setGameId(int gameId) {
-        this.gameId = gameId;
-    }
-
     public Player getCurrentPlayer() {
         return currentPlayer;
     }
@@ -53,18 +49,12 @@ public class Game {
     }
 
     public int getCurrentScore() {return currentScore;}
-    public void setCurrentScore(int currentScore) {this.currentScore = currentScore;}
 
     public ArrayList<Turn> getTurns() {
         return turns;
     }
 
-    public void setTurns(ArrayList<Turn> turns) {
-        this.turns = turns;
-    }
-
     public Board getBoard() {return board;}
-    public void setBoard(Board board) {this.board = board;}
 
     public void makeMove(Direction slideDirection) {
         //generalize board into a 2D array

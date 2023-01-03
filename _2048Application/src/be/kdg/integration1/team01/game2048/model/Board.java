@@ -17,9 +17,7 @@ public class Board {
     }
 
     public int getSize() {return size;}
-    public void setSize(int size) {this.size = size;}
     public ArrayList<Block> getBlocks() {return blocks;}
-    public void setBlocks(ArrayList<Block> blocks) {this.blocks = blocks;}
 
     public Block[][] getArray() {
         Block[][] arr = new Block[size][size];
@@ -209,15 +207,6 @@ public class Board {
     }
     @Override
     public String toString() {
-//        return  ":-------------------------:\n" +
-//                "|     |      |      |     |\n" +
-//                ":-------------------------:\n" +
-//                "|     |      |      |     |\n" +
-//                ":-------------------------:\n" +
-//                "|     |      | 2    |     |\n" +
-//                ":-------------------------:\n" +
-//                "| 2   |      |      |     |\n" +
-//                ":-------------------------:\n";
         return formattedBoardFromArray(getArray());
     }
 }
