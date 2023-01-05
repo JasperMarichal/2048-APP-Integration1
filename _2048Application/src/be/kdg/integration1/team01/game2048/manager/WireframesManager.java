@@ -1,11 +1,8 @@
 package be.kdg.integration1.team01.game2048.manager;
 
-import be.kdg.integration1.team01.game2048._2048Application;
 import be.kdg.integration1.team01.game2048.model.LeaderboardEntry;
 import be.kdg.integration1.team01.game2048.model.Wireframe;
 import be.kdg.integration1.team01.game2048.model.Game;
-
-import java.util.Scanner;
 
 import static be.kdg.integration1.team01.game2048._2048Application.leaderboard;
 

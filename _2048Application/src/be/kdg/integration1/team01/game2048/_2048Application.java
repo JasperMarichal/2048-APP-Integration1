@@ -169,17 +169,17 @@ public class _2048Application {
             );
             // TEST LEADERBOARD VALUES
             prepareDB.executeUpdate("DELETE FROM INT_leaderboard WHERE player_name IN ('hello', 'aaa', 'DemO');");
-            prepareDB.executeUpdate("insert into int_players values('hello') on conflict do nothing;");
-            prepareDB.executeUpdate("INSERT INTO int_leaderboard values (4637 ,'hello' ,current_date , interval '342 seconds') on conflict do nothing;");
-            prepareDB.executeUpdate("INSERT INTO int_leaderboard values (6443 ,'hello' ,current_date , interval '634 seconds') on conflict do nothing;");
-            prepareDB.executeUpdate("INSERT INTO int_leaderboard values (124 ,'hello' ,current_date , interval '53 seconds') on conflict do nothing;");
-            prepareDB.executeUpdate("INSERT INTO int_leaderboard values (2341 ,'hello' ,current_date , interval '123 seconds') on conflict do nothing;");
-            prepareDB.executeUpdate("INSERT INTO int_leaderboard values (1231 ,'hello' ,current_date , interval '32 seconds') on conflict do nothing;");
-            prepareDB.executeUpdate("INSERT INTO int_leaderboard values (234 ,'hello' ,current_date , interval '64 seconds') on conflict do nothing;");
-            prepareDB.executeUpdate("insert into int_players values('aaa') on conflict do nothing;");
-            prepareDB.executeUpdate("INSERT INTO int_leaderboard values (5474 ,'aaa' ,current_date , interval '213 seconds') on conflict do nothing;");
-            prepareDB.executeUpdate("INSERT INTO int_leaderboard values (5474 ,'aaa' ,current_date , interval '123 seconds') on conflict do nothing;");
-            prepareDB.executeUpdate("INSERT INTO int_leaderboard values (5634 ,'aaa' ,current_date , interval '213 seconds') on conflict do nothing;");
+            prepareDB.executeUpdate("insert into int_players values('Tomas') on conflict do nothing;");
+            prepareDB.executeUpdate("INSERT INTO int_leaderboard values (4637 ,'Tomas' ,current_date , interval '342 seconds') on conflict do nothing;");
+            prepareDB.executeUpdate("INSERT INTO int_leaderboard values (6443 ,'Tomas' ,current_date , interval '634 seconds') on conflict do nothing;");
+            prepareDB.executeUpdate("INSERT INTO int_leaderboard values (124 ,'Tomas' ,current_date , interval '53 seconds') on conflict do nothing;");
+            prepareDB.executeUpdate("INSERT INTO int_leaderboard values (2341 ,'Tomas' ,current_date , interval '123 seconds') on conflict do nothing;");
+            prepareDB.executeUpdate("INSERT INTO int_leaderboard values (1231 ,'Tomas' ,current_date , interval '32 seconds') on conflict do nothing;");
+            prepareDB.executeUpdate("INSERT INTO int_leaderboard values (234 ,'Tomas' ,current_date , interval '64 seconds') on conflict do nothing;");
+            prepareDB.executeUpdate("insert into int_players values('Koen') on conflict do nothing;");
+            prepareDB.executeUpdate("INSERT INTO int_leaderboard values (5474 ,'Koen' ,current_date , interval '213 seconds') on conflict do nothing;");
+            prepareDB.executeUpdate("INSERT INTO int_leaderboard values (5474 ,'Koen' ,current_date , interval '123 seconds') on conflict do nothing;");
+            prepareDB.executeUpdate("INSERT INTO int_leaderboard values (5634 ,'Koen' ,current_date , interval '213 seconds') on conflict do nothing;");
             prepareDB.executeUpdate("insert into int_players values('DemO') on conflict do nothing;");
             prepareDB.executeUpdate("INSERT INTO int_leaderboard values (2345 ,'DemO' ,current_date , interval '65 seconds') on conflict do nothing;");
             prepareDB.executeUpdate("INSERT INTO int_leaderboard values (2345 ,'DemO' ,current_date - interval '2 days', interval '65 seconds') on conflict do nothing;");

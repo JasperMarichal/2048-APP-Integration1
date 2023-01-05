@@ -1,12 +1,9 @@
 package be.kdg.integration1.team01.game2048.manager;
 
 import be.kdg.integration1.team01.game2048.model.*;
-import org.postgresql.util.PGInterval;
 
 import java.sql.*;
 import java.util.ArrayList;
-
-import static be.kdg.integration1.team01.game2048._2048Application.leaderboard;
 
 public class SaveManager {
     //SaveGame methods
@@ -16,7 +13,7 @@ public class SaveManager {
                 PreparedStatement insertAttempt = connection.prepareStatement(
                         """
                         INSERT INTO int_board (
-                        board_size) 
+                        board_size)
                         VALUES (?);
                         """
                         , PreparedStatement.RETURN_GENERATED_KEYS
@@ -40,7 +37,7 @@ public class SaveManager {
             else if(game.getGameId() > 0){
                 PreparedStatement getBoard = connection.prepareStatement(
                         """
-                        SELECT ib.board_id 
+                        SELECT ib.board_id
                         FROM int_board ib
                         JOIN int_games ig on ib.board_id = ig.board_id
                         WHERE ib.board_id = ig.board_id
@@ -82,7 +79,7 @@ public class SaveManager {
                             player_name
                             , current_score
                             , current_turn
-                            , board_id) 
+                            , board_id)
                             VALUES (?, ?, ?, ?);
                             """
             );
@@ -127,7 +124,7 @@ public class SaveManager {
         try {
             PreparedStatement deleteAttempt = connection.prepareStatement(
                     """
-                            DELETE FROM int_blocks b WHERE b.board_id 
+                            DELETE FROM int_blocks b WHERE b.board_id
                             IN (SELECT g.board_id FROM int_games g
                             WHERE g.game_id = ?);
                             """
@@ -149,7 +146,7 @@ public class SaveManager {
                             block_value
                             , block_x
                             , block_y
-                            , board_id) 
+                            , board_id)
                             VALUES (?, ?, ?, ?);
                            """
             );
@@ -176,7 +173,7 @@ public class SaveManager {
                             ,current_score
                             ,current_turn
                             ,board_id
-                            ,player_name 
+                            ,player_name
                             FROM int_games WHERE game_id = ?;
                         """
             );
@@ -227,7 +224,7 @@ public class SaveManager {
         try {
             PreparedStatement getBlock = connection.prepareStatement(
                     """
-                        SELECT 
+                        SELECT
                         block_value
                         ,block_x
                         ,block_y
@@ -259,7 +256,7 @@ public class SaveManager {
             PreparedStatement getSaveGamesOfPlayer = databaseConnection.prepareStatement(
                     """
                         SELECT g.game_id
-                        FROM int_players p 
+                        FROM int_players p
                         JOIN int_games g on p.player_name = g.player_name
                         WHERE p.player_name = ?;
                         """
@@ -267,7 +264,7 @@ public class SaveManager {
             getSaveGamesOfPlayer.setString(1, player.getName());
             ResultSet blockEntry = getSaveGamesOfPlayer.executeQuery();
 
-            ArrayList<Long> Arr = new ArrayList<Long>();
+            ArrayList<Long> Arr = new ArrayList<>();
 
             while(blockEntry.next()) {
                 Arr.add(blockEntry.getLong(1));
