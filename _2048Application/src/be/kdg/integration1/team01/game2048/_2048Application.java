@@ -84,6 +84,16 @@ public class _2048Application {
         }
     }
 
+    /**
+     * This function creates a menu with the given list of options, and makes the user select
+     * one of these options. It is used for the main menu, and the save selection.
+     * @param menuName What the menu will be called
+     * @param menuOptions The list of options
+     * @param zeroOptionName This option is always displayed last and can be selected with 0,
+     *                       use it as the "Cancel" "Back" or "Exit" option.
+     * @return The id of the selected option, which is either 0 for the zeroOption
+     * or the position of that option in the menuOptions array (ie. index+1).
+     */
     public static int selectFromMenu(String menuName, String[] menuOptions, String zeroOptionName) {
         int selectedOption = -1;
         do {
@@ -109,6 +119,16 @@ public class _2048Application {
         return selectedOption;
     }
 
+    /**
+     * This function establishes a connection to the database which takes a relatively long time
+     * (it is "expensive") that is why this function is only called once at the start of the program
+     * and the resulting Connection object is kept until the program closes. (The same Connection
+     * instance gets passed to every function that needs to talk to the database.)
+     * <br><br>
+     * This function also creates any missing tables if necessary (and adds a few test values).
+     *
+     * @return The Connection object that represents an active connection to the database
+     */
     public static Connection initializeDatabase() {
         try {
             System.out.println("INFO: Connecting to database...");

@@ -73,6 +73,11 @@ public class Board {
         return arr;
     }
 
+    /**
+     * Slides the blocks in the given general array and returns the potential score increase
+     * @param blocksArray general array that will get modified
+     * @return the amount of score gained (the total value of the newly combined blocks)
+     */
     public static int slideGeneralArray(Block[][] blocksArray) {
         int scoreIncrease = 0;
         for (int col = 0; col < blocksArray.length; col++) {
@@ -135,6 +140,12 @@ public class Board {
         }
     }
 
+    /**
+     * This is used for checking if the game should end,
+     * a.k.a. if the tiles cannot be slided in any direction.
+     * (win-/lose-condition check)
+     * @return true if the tiles can be slided in ANY of the 4 directions, false if not
+     */
     public boolean isSlideable() {
         //Check if the board can be moved in ANY of the four directions
         for(Direction slideDirection : Direction.values()) {
@@ -146,6 +157,13 @@ public class Board {
         return false;
     }
 
+    /**
+     * Checks if there is a difference between the two given block arrays
+     * by comparing the values of the blocks at each position of the array.
+     * @param array first block array
+     * @param brray second block array
+     * @return true if there is a difference, false if they are an exact match
+     */
     public static boolean doBlockArraysDiffer(Block[][] array, Block[][] brray) {
         for (int x = 0; x < array.length; x++) {
             for (int y = 0; y < array[x].length; y++) {
@@ -159,6 +177,12 @@ public class Board {
         return false;
     }
 
+    /**
+     * Find every empty cell in block array.
+     * @param blocksArray the block array that represents the board
+     * @return Returns an int[] of (x, y) value pairs (int[0] = posX, int[1] = posY) that give the position
+     *         of all the empty cells on the board (block array).
+     */
     public static ArrayList<int[]> getPositionsOfEmptyCells(Block[][] blocksArray) {
         ArrayList<int[]> emptyCells = new ArrayList<>();
         for (int x = 0; x < blocksArray.length; x++) {
@@ -171,6 +195,12 @@ public class Board {
         return emptyCells;
     }
 
+    /**
+     * Creates a given numberOfBlocks, with a given value, at random (empty) positions.
+     * If it runs out of empty cells the remaining blocks will not be added.
+     * @param value the value of the block(s) to generate
+     * @param numberOfBlocks the number of new block(s) to make
+     */
     public void addBlocksRandomly(int value, int numberOfBlocks) {
         Random rng = new Random();
         Block[][] blocksArray = getArray();
@@ -189,6 +219,10 @@ public class Board {
         fromArray(blocksArray);
     }
 
+    /**
+     * @param blocksArray the block array to be represented as a table
+     * @return A formatted representation of the given block array
+     */
     public static String formattedBoardFromArray(Block[][] blocksArray) {
         String horizontalLine = ":" + "-".repeat(6* blocksArray.length - 1) + ":\n";
         StringBuilder brd = new StringBuilder(horizontalLine);

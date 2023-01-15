@@ -69,7 +69,14 @@ public class Game {
         board.addBlocksRandomly(2, 1);
     }
 
-
+    /**
+     * This is the main game logic of the game with the game loop,
+     * it also calculates and lets you save the score if the game ends
+     * or lets you save the game if it is stopped by the player.
+     * @param connection database connection
+     * @param isBeginning true if this is a new game, false if it is a save being loaded
+     * @return 0 = quit game, 1 = return to main menu, 2 = keep same player, start a new game
+     */
     public int play(Connection connection, boolean isBeginning) {
         Scanner keyboard = new Scanner(System.in);
         LocalDateTime start_datetime = LocalDateTime.now();
@@ -145,6 +152,12 @@ public class Game {
         }
     }
 
+    /**
+     * This method handles the command-processing
+     * @param command command to execute
+     * @param connection database connection (for the commands that need it, for example leaderboard)
+     * @return the string entered by the player for commands where waitToContinue is true (used as the next command)
+     */
     public String processCommand(String command, Connection connection) {
         if (command == null || command.isEmpty()) return "";
         String[] args = command.toUpperCase().split(" ");

@@ -20,6 +20,12 @@ public class LeaderboardManager {
         );
     }
 
+    /**
+     * Saves a given attempt to the leaderboard (database)
+     * @param connection database connection
+     * @param attempt the LeaderboardEntry resulting from a finished Game
+     * @return true if it was a success, false if it failed
+     */
     public static boolean saveAttempt(Connection connection, LeaderboardEntry attempt) {
         try {
             PreparedStatement insertAttempt = connection.prepareStatement(
@@ -37,6 +43,15 @@ public class LeaderboardManager {
             return false;
         }
     }
+
+    /**
+     * Fetches the scores (of all players).
+     * It either gets only the top 5 scores or it gets the full leaderboard.
+     * The results are not returned, rather they are placed in the public static LeaderboardEntry
+     * arraylist stored in the main _2048Application class (_2048Application.leaderboard) for ease of access.
+     * @param connection database connection
+     * @param fetchAll set to true if all entries should be fetched, false if only the top 5
+     */
     public static void fetchTopScores(Connection connection, boolean fetchAll) {
         try {
             PreparedStatement selectTopScores = connection.prepareStatement(
@@ -61,6 +76,15 @@ public class LeaderboardManager {
         }
     }
 
+    /**
+     * Fetches the scores of a specific player.
+     * It either gets only the top 5 scores or it gets the full leaderboard.
+     * The results are not returned, rather they are placed in the public static LeaderboardEntry
+     * arraylist stored in the main _2048Application class (_2048Application.leaderboard) for ease of access.
+     * @param connection database connection
+     * @param playerName the name of the player whose scores need to be fetched
+     * @param fetchAll set to true if all entries should be fetched, false if only the top 5
+     */
     public static void fetchTopAttemptsOfPlayer(Connection connection, String playerName, boolean fetchAll) {
         try {
             PreparedStatement selectTopScores = connection.prepareStatement(

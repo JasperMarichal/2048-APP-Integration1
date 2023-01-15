@@ -10,6 +10,11 @@ import static be.kdg.integration1.team01.game2048._2048Application.players;
 
 public class PlayerManager {
 
+    /**
+     * Fetches an updated player list from the database
+     * @param connection database connection
+     * @return the arraylist of all players that exist in the database
+     */
     public static ArrayList<Player> updatePlayersList(Connection connection) {
         ArrayList<Player> updatedList = new ArrayList<>();
         try {
